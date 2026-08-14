@@ -21,6 +21,7 @@ import os
 import re
 import time
 from datetime import date, datetime, timedelta
+from collections.abc import Callable
 from html.parser import HTMLParser
 from typing import Any
 
@@ -37,7 +38,9 @@ FOLDER_CACHE_TTL = 60.0  # 秒
 
 BATCH_SIZE = 20  # Graph の /$batch が1リクエストで受ける上限
 MAX_BULK_MESSAGES = 2000  # move_by_search が1回で動かす上限
-MAX_BULK_SCAN = 20000  # move_by_search が走査するメール数の上限(無限ループ避け)
+# 既読化は移動と違ってメールの居場所を変えないため、上限を緩めてある。
+MAX_BULK_MARK = 25000
+MAX_BULK_SCAN = 50000  # 一括操作が走査するメール数の上限(無限ループ避け)
 PAGE_SIZE = 100  # 一覧取得の1ページ
 
 mcp = MCPServer(
@@ -401,28 +404,17 @@ def graph(method: str, path: str, **kwargs: Any) -> dict:
     return r.json()
 
 
-def batch_move(ids: list[str], dest: str) -> tuple[int, list[str]]:
-    """メールをまとめて移動する。(成功数, 失敗の説明) を返す。
+def run_batch(ids: list[str], make: Callable[[str], dict]) -> tuple[int, list[str]]:
+    """メールを20件ずつ /$batch にまとめて処理する。(成功数, 失敗の説明) を返す。
 
-    1通ずつ POST すると4万通で4万往復になるので、Graph の /$batch に
-    20件ずつ束ねる。バッチは「全体で200 OK、中の1件だけ404」がありうるので、
-    レスポンスは1件ずつ status を見る。
+    1通ずつ叩くと1万通で1万往復になる。make(message_id) が1件分の
+    リクエストを組み立てる。バッチは「全体で200 OK、中の1件だけ404」が
+    ありうるので、レスポンスは1件ずつ status を見る。
     """
     ok, failed = 0, []
     for i in range(0, len(ids), BATCH_SIZE):
         chunk = ids[i:i + BATCH_SIZE]
-        body = {
-            "requests": [
-                {
-                    "id": str(n),
-                    "method": "POST",
-                    "url": f"/me/messages/{mid}/move",
-                    "headers": {"Content-Type": "application/json"},
-                    "body": {"destinationId": dest},
-                }
-                for n, mid in enumerate(chunk)
-            ]
-        }
+        body = {"requests": [dict(make(mid), id=str(n)) for n, mid in enumerate(chunk)]}
         for resp in graph("POST", "/$batch", json=body).get("responses", []):
             try:
                 n = int(resp.get("id", "-1"))
@@ -435,6 +427,29 @@ def batch_move(ids: list[str], dest: str) -> tuple[int, list[str]]:
                 detail = ((resp.get("body") or {}).get("error") or {}).get("message", f"HTTP {status}")
                 failed.append(f"{chunk[n][:12]}…: {detail}")
     return ok, failed
+
+
+JSON_HEADER = {"Content-Type": "application/json"}
+
+
+def batch_move(ids: list[str], dest: str) -> tuple[int, list[str]]:
+    """メールをまとめて別フォルダへ移す。"""
+    return run_batch(ids, lambda mid: {
+        "method": "POST",
+        "url": f"/me/messages/{mid}/move",
+        "headers": JSON_HEADER,
+        "body": {"destinationId": dest},
+    })
+
+
+def batch_mark_read(ids: list[str], read: bool = True) -> tuple[int, list[str]]:
+    """メールをまとめて既読/未読にする。移動しないので短縮IDは失効しない。"""
+    return run_batch(ids, lambda mid: {
+        "method": "PATCH",
+        "url": f"/me/messages/{mid}",
+        "headers": JSON_HEADER,
+        "body": {"isRead": bool(read)},
+    })
 
 
 def collect_message_ids(
@@ -1044,6 +1059,92 @@ def move_by_search(
     ok, failed = batch_move(ids, dest_id)
     _invalidate_folders()
     out = head + f"\n\n{ok:,}件を「{dest}」へ移動しました。"
+    if failed:
+        out += f"\n失敗 {len(failed)}件:\n" + "\n".join(failed[:10])
+        if len(failed) > 10:
+            out += f"\n…ほか {len(failed) - 10}件"
+    return out
+
+
+@mcp.tool(annotations=WRITE)
+@handle_errors
+def mark_read_by_search(
+    folder: str | None = None,
+    from_address: str | None = None,
+    subject_contains: str | None = None,
+    since: str | None = None,
+    until: str | None = None,
+    read: bool = True,
+    max_messages: int = 5000,
+    dry_run: bool = True,
+) -> str:
+    """条件に一致するメールをまとめて既読(または未読)にする。
+
+    mark_messages_read の大量版。メールは移動しないので、居場所も
+    短縮IDも変わらない。既定は dry_run=True で件数を数えるだけ。
+
+    注意: 既読/未読は「まだ見ていない」という情報そのものなので、
+    まとめて既読にすると何が未処理だったかは復元できない。
+    実行前に必ず対象と件数を利用者に示して確認を取ること。
+
+    Args:
+        folder: 対象フォルダ。省略するとメールボックス全体。
+        from_address: 差出人の部分一致(アドレスと表示名の両方を見る)。
+        subject_contains: 件名の部分一致。
+        since: この日以降 YYYY-MM-DD。
+        until: この日まで(その日を含む) YYYY-MM-DD。
+        read: True(既定)で既読、False で未読に戻す。
+        max_messages: 1回で処理する上限。既定5000、上限25000。
+        dry_run: True(既定)なら件数を数えるだけ。False で実際に変更する。
+    """
+    ensure_writable()
+    cap = max(1, min(int(max_messages), MAX_BULK_MARK))
+    folders = fetch_folders()
+
+    scope = "/me/messages"
+    src_label = "メールボックス全体"
+    if folder:
+        src = resolve_folder_entry(folder, folders)
+        scope = f"/me/mailFolders/{src['id']}/messages"
+        src_label = src["path"]
+
+    # 既読にするなら未読だけ、未読に戻すなら既読だけを拾えば無駄がない。
+    odata = build_odata_filter(since, until, unread_only=bool(read))
+    if not read:
+        clause = "isRead eq true"
+        odata = f"{odata} and {clause}" if odata else clause
+
+    ids, scanned = collect_message_ids(
+        scope, odata, from_address, subject_contains, cap,
+    )
+
+    want = "既読" if read else "未読"
+    cond = " / ".join(
+        c for c in [
+            f"差出人:{from_address}" if from_address else "",
+            f"件名:{subject_contains}" if subject_contains else "",
+            f"{since}以降" if since else "",
+            f"{until}まで" if until else "",
+        ] if c
+    ) or f"(フォルダ全体の{'未読' if read else '既読'})"
+
+    head = f"対象: {src_label}\n条件: {cond}\n走査 {scanned:,}件 → 該当 {len(ids):,}件"
+    if not ids:
+        return head + f"\nすでに全て{want}です。変更するものはありませんでした。"
+    if len(ids) >= cap:
+        head += f"\n※ 上限 {cap:,}件に達しました。同じ呼び出しを繰り返せば続きを処理できます。"
+
+    if dry_run:
+        return (
+            head
+            + "\n\n【下見のみ・まだ変更していません】\n"
+            + f"dry_run=False で呼ぶと {len(ids):,}件を{want}にします。"
+            + ("\n既読にすると『まだ見ていない』という情報は復元できません。" if read else "")
+        )
+
+    ok, failed = batch_mark_read(ids, read)
+    _invalidate_folders()
+    out = head + f"\n\n{ok:,}件を{want}にしました。"
     if failed:
         out += f"\n失敗 {len(failed)}件:\n" + "\n".join(failed[:10])
         if len(failed) > 10:

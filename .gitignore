@@ -4,3 +4,6 @@ __pycache__/
 token_cache.json
 *.token_cache.json
 .pytest_cache/
+
+# 一括既読化の巻き戻し用スナップショット(メールIDの一覧)
+unread-backup.json

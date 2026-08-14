@@ -412,6 +412,52 @@ def test_move_by_search_executes_when_not_dry_run(calls):
     assert "1件を「領収書」へ移動しました" in out
 
 
+def test_batch_mark_read_patches_is_read(calls):
+    calls.responses["/$batch"] = {"responses": [{"id": "0", "status": 200}]}
+    ok, failed = s.batch_mark_read(["A"], read=True)
+    req = calls[-1][2]["json"]["requests"][0]
+    assert req["method"] == "PATCH"
+    assert req["url"] == "/me/messages/A"
+    assert req["body"] == {"isRead": True}
+    assert ok == 1 and not failed
+
+
+def test_mark_read_by_search_filters_to_unread_only(calls):
+    calls.responses["/messages"] = {"value": []}
+    s.mark_read_by_search(folder="領収書")
+    # 既読にするのだから、拾うのは未読だけでよい
+    assert "isRead eq false" in calls[0][2]["params"]["$filter"]
+
+
+def test_mark_read_by_search_unmark_targets_read_mail(calls):
+    calls.responses["/messages"] = {"value": []}
+    s.mark_read_by_search(folder="領収書", read=False)
+    assert "isRead eq true" in calls[0][2]["params"]["$filter"]
+
+
+def test_mark_read_by_search_dry_run_changes_nothing(calls):
+    calls.responses["/messages"] = {"value": [{"id": "A", "subject": "s", "from": {}}]}
+    out = s.mark_read_by_search(folder="領収書")
+    assert "まだ変更していません" in out
+    assert "復元できません" in out  # 不可逆であることを告げる
+    assert not any(p == "/$batch" for _, p, _ in calls)
+
+
+def test_mark_read_by_search_executes_when_not_dry_run(calls):
+    calls.responses["/messages"] = {"value": [{"id": "A", "subject": "s", "from": {}}]}
+    calls.responses["/$batch"] = {"responses": [{"id": "0", "status": 200}]}
+    out = s.mark_read_by_search(folder="領収書", dry_run=False)
+    assert "1件を既読にしました" in out
+
+
+def test_mark_read_by_search_allows_whole_mailbox(calls):
+    # move と違い、既読化は居場所を変えないので条件なしでも許す
+    calls.responses["/messages"] = {"value": []}
+    out = s.mark_read_by_search()
+    assert not out.startswith("エラー:")
+    assert calls[0][1] == "/me/messages"
+
+
 def test_move_by_search_rejects_same_source_and_dest(calls):
     out = s.move_by_search(dest="領収書", folder="領収書")
     assert out.startswith("エラー:") and "同じフォルダ" in out
