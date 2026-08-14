@@ -26,9 +26,9 @@
   <text class="t tool" x="24" y="154">  search_messages(folder="受信トレイ", limit=50)</text>
   <text class="t txt"  x="24" y="176">  <tspan class="num">140件</tspan>を確認しました。既存のフォルダへ流し込みます。</text>
 
-  <text class="t tool" x="24" y="212">  move_by_search(from_address="ぐるなび", dest="06_Shop/Meal/ぐるなび")</text>
+  <text class="t tool" x="24" y="212">  move_by_search(from_address="〇〇グルメ", dest="06_Shop/Meal/〇〇グルメ")</text>
   <text class="t dim"  x="24" y="232">    走査 108件 → 該当 <tspan class="num">9件</tspan> … 9件を移動しました。</text>
-  <text class="t tool" x="24" y="256">  move_by_search(from_address="マネックス", dest="02_Invest/マネックス証券")</text>
+  <text class="t tool" x="24" y="256">  move_by_search(from_address="〇〇証券", dest="02_Invest/〇〇証券")</text>
   <text class="t dim"  x="24" y="276">    走査 99件 → 該当 <tspan class="num">6件</tspan> … 6件を移動しました。</text>
   <text class="t dim"  x="24" y="300">    … ほか 20 の差出人</text>
 

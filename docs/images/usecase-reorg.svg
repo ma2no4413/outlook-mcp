@@ -24,13 +24,13 @@
 
   <text class="t cc"   x="24" y="132">● Claude</text>
   <text class="t tool" x="24" y="154">  list_folders()</text>
-  <text class="t txt"  x="24" y="176">  Music / Communication / Game / Employment は未読がほぼゼロで、</text>
+  <text class="t txt"  x="24" y="176">  Newsletters / SNS / Games / 旧プロジェクト は未読がほぼゼロで、</text>
   <text class="t txt"  x="24" y="196">  数年触られていません。棚ごと移します。</text>
 
-  <text class="t tool" x="24" y="232">  move_folder(folder="Music", parent="99_Archive")</text>
-  <text class="t dim"  x="24" y="252">    Music を 99_Archive の下へ移しました(サブフォルダごと)。</text>
-  <text class="t tool" x="24" y="274">  move_folder(folder="Communication", parent="99_Archive")  … ほか2件</text>
+  <text class="t tool" x="24" y="232">  move_folder(folder="Newsletters", parent="99_Archive")</text>
+  <text class="t dim"  x="24" y="252">    Newsletters を 99_Archive の下へ移しました(サブフォルダごと)。</text>
+  <text class="t tool" x="24" y="274">  move_folder(folder="SNS", parent="99_Archive")  … ほか2件</text>
 
-  <text class="t txt"  x="24" y="310">  約 <tspan class="num">10,100通</tspan> を退避。<tspan class="ok">メールは1通も動いていません。</tspan></text>
+  <text class="t txt"  x="24" y="310">  約 <tspan class="num">10,000通</tspan> を退避。<tspan class="ok">メールは1通も動いていません。</tspan></text>
   <text class="t cap"  x="24" y="336">棚ごと移すため、API呼び出しは4回だけ。1通ずつ動かすと数千回かかります。</text>
 </svg>

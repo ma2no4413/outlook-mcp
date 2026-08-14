@@ -39,8 +39,8 @@ Microsoft Graph API を使います。**メールの送信はできません。�
 
 ```
 あなた: 受信トレイを差出人ごとに振り分けて空にして
-Claude: 140件を確認しました。ぐるなび9件→06_Shop/Meal/ぐるなび、
-        マネックス6件→02_Invest/マネックス証券、… 全140件を振り分けます。
+Claude: 140件を確認しました。〇〇グルメ9件→06_Shop/Meal/〇〇グルメ、
+        〇〇証券6件→02_Invest/〇〇証券、… 全140件を振り分けます。
 ```
 
 ### 何年も溜まったフォルダを再編する
@@ -53,10 +53,10 @@ Claude: 140件を確認しました。ぐるなび9件→06_Shop/Meal/ぐるな�
 
 ```mermaid
 flowchart TD
-    Q["Music フォルダ 6,193通 を<br/>99_Archive の下へ移したい"]
+    Q["Newsletters フォルダ 6,000通 を<br/>99_Archive の下へ移したい"]
     Q --> A["move_messages を繰り返す"]
     Q --> B["move_folder を1回呼ぶ"]
-    A --> A1["25件ずつ = 248回の呼び出し<br/>全メールのIDが失効する<br/>途中で失敗すると中途半端に散らばる"]
+    A --> A1["25件ずつ = 240回の呼び出し<br/>全メールのIDが失効する<br/>途中で失敗すると中途半端に散らばる"]
     B --> B1["フォルダの親を変えるだけ = 1回<br/>メールは1通も動かない<br/>IDも失効しない"]
 
     classDef ask fill:#1f6feb,stroke:#388bfd,color:#ffffff
@@ -79,8 +79,8 @@ flowchart TD
 
 ```
 あなた: この差出人、今後は自動でこのフォルダに入れて
-Claude: ルール「Meta広告の領収書」を作成しました(適用順 33)。
-        今後届く分を 04_Business/Meta広告 へ移動 + 既読化します。
+Claude: ルール「クラウドの請求書」を作成しました(適用順 33)。
+        今後届く分を 04_Business/請求書 へ移動 + 既読化します。
         既に届いている分は move_by_search で別途動かせます。
 ```
 
@@ -220,19 +220,19 @@ Claude: OK: 受信トレイ 3,412件(未読 87件)にアクセスできました
 **既定は下見(`dry_run=True`)で、何件動くかを数えるだけです。**
 
 ```
-move_by_search(dest="99_Archive", folder="Music")
-  → 元: Music / 走査 6,214件 → 該当 6,214件
+move_by_search(dest="99_Archive", folder="Newsletters")
+  → 元: Newsletters / 走査 6,000件 → 該当 6,000件
     【下見のみ・まだ動かしていません】
 
-move_by_search(dest="99_Archive", folder="Music", dry_run=False)
-  → 6,214件を「99_Archive」へ移動しました。
+move_by_search(dest="99_Archive", folder="Newsletters", dry_run=False)
+  → 6,000件を「99_Archive」へ移動しました。
 ```
 
 内部では Graph の `/$batch` に20件ずつ束ねます。1通ずつ叩くと往復回数が現実的でないためです。**レスポンスは1件ずつ status を見ます** — バッチ全体を成否で判定すると、一部がスロットリングされただけで全件を再処理することになるためです。
 
 - `move_by_search` は絞り込み条件を1つも指定しない呼び出しを**拒否**します(メールボックス全体を無条件に動かす事故を防ぐため)
 - `mark_read_by_search` は居場所を変えないため条件なしを許し、上限も緩めてあります。ただし**既読/未読は「まだ見ていない」という情報そのもので、まとめて既読にすると復元できません**
-- 差出人・件名の部分一致は手元で判定します(`$filter` が `contains()` を受け付けないため)。**アドレスと表示名の両方**を見るので、`ぐるなび` のような日本語の差出人名でも絞れます
+- 差出人・件名の部分一致は手元で判定します(`$filter` が `contains()` を受け付けないため)。**アドレスと表示名の両方**を見るので、`〇〇グルメ` のような日本語の差出人名でも絞れます
 
 > **棚ごと動かせるなら `move_folder` のほうが速いです。** メールを1通も動かさずに階層だけ変わります。
 
@@ -241,8 +241,8 @@ move_by_search(dest="99_Archive", folder="Music", dry_run=False)
 Outlook のサーバ側に保存されるルールです。**このMCPが起動していなくても24時間効きます。**
 
 ```
-create_rule(name="Meta広告の領収書", from_contains="facebookmail.com",
-            subject_contains="領収書", move_to="04_Business/Meta広告", mark_read=True)
+create_rule(name="クラウドの請求書", from_contains="billing@example.com",
+            subject_contains="請求書", move_to="04_Business/請求書", mark_read=True)
 ```
 
 - 条件(`from_contains` / `subject_contains` / `body_contains`)は複数指定すると **AND**。値はカンマ区切りで複数渡せます
