@@ -1,18 +1,18 @@
 ﻿outlook-mcp スモークテスト
-実行時刻: 2026-08-14T17:10:08+09:00
+実行時刻: 2026-08-14T22:26:14+09:00
 Python:   3.13.1
 対象:     I:\ClaudeCodeProjects\outlook-mcp\outlook_server.py
 ------------------------------------------------------------------------
 [PASS] S-01 stdio でハンドシェイクが成立し、サーバ名が outlook
          server_info.name = 'outlook'
-[PASS] S-02 ツールが 17 個、名前が一致
-         公開: ['archive_messages', 'check_config', 'create_folder', 'create_rule', 'delete_folder', 'delete_rule', 'get_message', 'list_folders', 'list_rules', 'mark_messages_read', 'mark_read_by_search', 'move_by_search', 'move_folder', 'move_messages', 'move_to_trash', 'rename_folder', 'search_messages']
+[PASS] S-02 ツールが 19 個、名前が一致
+         公開: ['archive_messages', 'check_config', 'create_draft', 'create_folder', 'create_rule', 'delete_folder', 'delete_rule', 'draft_reply', 'get_message', 'list_folders', 'list_rules', 'mark_messages_read', 'mark_read_by_search', 'move_by_search', 'move_folder', 'move_messages', 'move_to_trash', 'rename_folder', 'search_messages']
 [PASS] S-03 各ツールの required 引数がシグネチャどおり
-         全17ツール一致
+         全19ツール一致
 [PASS] S-04 read_only_hint / destructive_hint が正しく申告される
          destructive=True: move_to_trash, delete_folder, delete_rule
-[PASS] S-05 送信・完全削除のツールが存在しない
-         該当なし
+[PASS] S-05 送信の経路が存在しない(ツール名 + 要求スコープ)
+         送出系ツール: なし / 要求スコープ: Mail.ReadWrite MailboxSettings.ReadWrite
 [PASS] S-06 未設定/未ログインでも check_config が案内を返す
          check_config -> 設定ファイル: I:\ClaudeCodeProjects\outlook-mcp\.env
 [PASS] S-07 未設定/未ログインでも search_messages が案内を返す

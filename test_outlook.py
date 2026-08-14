@@ -279,6 +279,58 @@ def test_write_tools_return_error_string_in_readonly(monkeypatch):
     assert out.startswith("エラー:") and "OUTLOOK_READONLY" in out
 
 
+# ---------- 下書き(送信はしない) ----------
+
+def test_send_scope_is_never_requested():
+    """このプロジェクトの中核となる保証。壊れたら送信できてしまう。"""
+    import outlook_auth
+    joined = " ".join(outlook_auth.SCOPES).lower()
+    assert "mail.send" not in joined
+
+
+def test_create_draft_posts_to_messages_not_send(calls):
+    out = s.create_draft(to="a@example.com, b@example.com", subject="件名", body="本文")
+    method, path, kwargs = calls[-1]
+    assert (method, path) == ("POST", "/me/messages")  # /sendMail ではない
+    body = kwargs["json"]
+    assert [r["emailAddress"]["address"] for r in body["toRecipients"]] == ["a@example.com", "b@example.com"]
+    assert body["subject"] == "件名"
+    assert body["body"] == {"contentType": "Text", "content": "本文"}
+    assert "ccRecipients" not in body
+    assert "送信はしていません" in out
+
+
+def test_create_draft_includes_cc_when_given(calls):
+    s.create_draft(to="a@example.com", subject="件名", body="本文", cc="c@example.com")
+    assert calls[-1][2]["json"]["ccRecipients"] == [{"emailAddress": {"address": "c@example.com"}}]
+
+
+def test_create_draft_rejects_empty_recipient_and_subject(calls):
+    assert "宛先が空です" in s.create_draft(to=" , ", subject="件名", body="本文")
+    assert "件名が空です" in s.create_draft(to="a@example.com", subject="  ", body="本文")
+    assert not any(m == "POST" for m, _, _ in calls)  # 何も作っていない
+
+
+def test_draft_reply_uses_create_reply_endpoint(calls):
+    h = s.register_handle("REPLY-1")
+    out = s.draft_reply(h, body="承知しました")
+    method, path, kwargs = calls[-1]
+    assert (method, path) == ("POST", "/me/messages/REPLY-1/createReply")
+    assert kwargs["json"] == {"comment": "承知しました"}
+    assert "送信はしていません" in out
+
+
+def test_draft_reply_all_uses_reply_all_endpoint(calls):
+    s.draft_reply(s.register_handle("REPLY-2"), body="はい", reply_all=True)
+    assert calls[-1][1].endswith("/createReplyAll")
+
+
+def test_draft_tools_blocked_in_readonly(monkeypatch):
+    monkeypatch.setenv("OUTLOOK_READONLY", "true")
+    assert s.create_draft(to="a@example.com", subject="x", body="y").startswith("エラー:")
+    assert s.draft_reply("#1", body="y").startswith("エラー:")
+
+
 # ---------- フォルダ管理 ----------
 
 def test_system_folder_is_protected():

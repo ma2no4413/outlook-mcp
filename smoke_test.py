@@ -31,6 +31,8 @@ EXPECTED_TOOLS = {
     "search_messages": {"read_only": True, "destructive": None, "required": []},
     "get_message": {"read_only": True, "destructive": None, "required": ["message_id"]},
     "list_rules": {"read_only": True, "destructive": None, "required": []},
+    "create_draft": {"read_only": False, "destructive": False, "required": ["to", "subject", "body"]},
+    "draft_reply": {"read_only": False, "destructive": False, "required": ["message_id", "body"]},
     "create_folder": {"read_only": False, "destructive": False, "required": ["name"]},
     "rename_folder": {"read_only": False, "destructive": False, "required": ["folder", "new_name"]},
     "move_folder": {"read_only": False, "destructive": False, "required": ["folder"]},
@@ -110,12 +112,20 @@ async def run() -> int:
             check("S-04", "read_only_hint / destructive_hint が正しく申告される",
                   not bad, "\n".join(bad) or f"destructive=True: {', '.join(destructive)}")
 
-            # --- S-05 送信ツールが存在しない ---
+            # --- S-05 送信できないことの保証 ---
+            # 下書きの作成は許す(create_draft / draft_reply)。下書きはメールボックスに
+            # 置かれるだけで外へ出ない。禁じるのは実際に送出する経路だけ。
+            # ツール名の検査は補助でしかない。本当の保証は「Mail.Send を要求していない」
+            # ことなので、そちらも見る。権限が無ければ、仮にコードが壊れても送れない。
+            import outlook_auth
             forbidden = [n for n in tools if any(
-                k in n.lower() for k in ("send", "reply", "forward", "draft", "delete_permanent")
+                k in n.lower() for k in ("send", "submit", "permanent")
             )]
-            check("S-05", "送信・完全削除のツールが存在しない",
-                  not forbidden, "該当なし" if not forbidden else f"検出: {forbidden}")
+            scopes = " ".join(outlook_auth.SCOPES).lower()
+            send_scope = "mail.send" in scopes
+            check("S-05", "送信の経路が存在しない(ツール名 + 要求スコープ)",
+                  not forbidden and not send_scope,
+                  f"送出系ツール: {forbidden or 'なし'} / 要求スコープ: {' '.join(outlook_auth.SCOPES)}")
 
             # --- S-06〜S-08 例外を投げず、案内文字列を返す ---
             # MCPのエラー応答ではなく通常のテキストで返ること = LLMが次の手を打てる。
