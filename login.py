@@ -21,6 +21,14 @@ from outlook_auth import (
     signed_in_account,
 )
 
+# Windows の英語環境ではコンソールが cp1252 になり、日本語の案内を出した時点で
+# UnicodeEncodeError で落ちる。ログインは利用者が必ず一度は通る場所なので、
+# ここで確実に読める形にしておく。
+for _stream in (sys.stdout, sys.stderr):
+    _reconfigure = getattr(_stream, "reconfigure", None)
+    if _reconfigure is not None:
+        _reconfigure(encoding="utf-8", errors="replace")
+
 
 def logout() -> int:
     app, cache = build_app()

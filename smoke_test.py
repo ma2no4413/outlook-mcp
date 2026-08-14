@@ -23,6 +23,23 @@ from pathlib import Path
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
+
+def force_utf8_output() -> None:
+    """出力を UTF-8 に固定する。
+
+    Windows のコンソール既定は環境の言語で決まり、英語環境では cp1252 になる。
+    このファイルの出力は日本語なので、そのままだと最初の print で
+    UnicodeEncodeError になり、テストが1件も走らないまま落ちる。
+    日本語版 Windows(cp932)では通ってしまうため、開発機では気づけない。
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="replace")
+
+
+force_utf8_output()
+
 BASE_DIR = Path(__file__).resolve().parent
 
 EXPECTED_TOOLS = {
