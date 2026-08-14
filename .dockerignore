@@ -1,0 +1,22 @@
+# 認証情報をビルドコンテキストに入れない。
+# Dockerfile は COPY するファイルを明示しているが、二重に防いでおく。
+.env
+*.env
+token_cache.json
+*.token_cache.json
+unread-backup.json
+
+.git
+.gitignore
+.venv
+__pycache__
+.pytest_cache
+.claude
+
+docs
+README.md
+README.ja.md
+LICENSE
+test_outlook.py
+smoke_test.py
+pytest.ini

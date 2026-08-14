@@ -105,6 +105,29 @@ device code flow needs a browser and cannot be completed by an agent.
 
 ---
 
+### Docker (optional)
+
+Not required for normal use — running it directly is simpler. Provided for sandboxed runs and registry checks.
+
+```bash
+docker build -t outlook-mcp .
+
+# first sign-in (device code flow needs a terminal)
+docker run -it --rm -e OUTLOOK_CLIENT_ID=<your-id> \
+  -v outlook-mcp-token:/app/data -e OUTLOOK_TOKEN_CACHE=/app/data/token_cache.json \
+  outlook-mcp python login.py
+
+# as an MCP server (stdio: -i, never -t)
+docker run -i --rm -e OUTLOOK_CLIENT_ID=<your-id> \
+  -v outlook-mcp-token:/app/data -e OUTLOOK_TOKEN_CACHE=/app/data/token_cache.json \
+  outlook-mcp
+```
+
+Credentials are never baked into the image. The token cache lives in a named volume — it is the key to
+your mailbox, so keep it out of images and repositories.
+
+---
+
 ## Tools
 
 | Tool | Kind | What it does |
