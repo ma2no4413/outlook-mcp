@@ -1,0 +1,451 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - link "Glama home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Glama
+      - generic [ref=e9]:
+        - navigation "Primary" [ref=e10]:
+          - link "Servers" [ref=e11] [cursor=pointer]:
+            - /url: /mcp/servers
+          - link "Connectors" [ref=e12] [cursor=pointer]:
+            - /url: /mcp/connectors
+          - link "Tools" [ref=e13] [cursor=pointer]:
+            - /url: /mcp/tools
+          - link "Clients" [ref=e14] [cursor=pointer]:
+            - /url: /mcp/clients
+          - link "Inspector" [ref=e15] [cursor=pointer]:
+            - /url: /mcp/inspector
+          - link "Pricing" [ref=e16] [cursor=pointer]:
+            - /url: /pricing
+          - link "Community" [ref=e17] [cursor=pointer]:
+            - /url: /discord
+        - button "Sign Up" [ref=e20] [cursor=pointer]
+  - generic [ref=e21]:
+    - main [ref=e22]:
+      - navigation [ref=e24]:
+        - link "Glama" [ref=e26] [cursor=pointer]:
+          - /url: /
+        - link "MCP" [ref=e28] [cursor=pointer]:
+          - /url: /mcp
+        - link "Servers" [ref=e30] [cursor=pointer]:
+          - /url: /mcp/servers
+      - textbox "Search MCP servers, tools, and more" [ref=e35]
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - img "ma2no4413" [ref=e38]
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - heading "outlook-mcp" [level=2] [ref=e42]
+                - button "Favorite" [ref=e43] [cursor=pointer]
+              - list "Categories" [ref=e47]:
+                - link "Email" [ref=e48] [cursor=pointer]:
+                  - /url: /mcp/categories/email
+                - link "Workplace & Productivity" [ref=e52] [cursor=pointer]:
+                  - /url: /mcp/categories/workplace-and-productivity
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - text: by
+                - link "ma2no4413" [ref=e59] [cursor=pointer]:
+                  - /url: /mcp/servers?query=author%3Ama2no4413
+              - generic "Server maintainers are verified by Glama" [ref=e61]
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - link "Overview" [ref=e66] [cursor=pointer]:
+              - /url: /mcp/servers/ma2no4413/outlook-mcp
+            - link "Schema" [ref=e67] [cursor=pointer]:
+              - /url: /mcp/servers/ma2no4413/outlook-mcp/schema
+            - link "Related Servers" [ref=e68] [cursor=pointer]:
+              - /url: /mcp/servers/ma2no4413/outlook-mcp/related-servers
+            - link "Score" [ref=e69] [cursor=pointer]:
+              - /url: /mcp/servers/ma2no4413/outlook-mcp/score
+            - link "Discussions" [ref=e70] [cursor=pointer]:
+              - /url: /mcp/servers/ma2no4413/outlook-mcp/discussions
+          - generic [ref=e71]:
+            - link "Python" [ref=e74] [cursor=pointer]:
+              - /url: /mcp/servers?attributes=language%3Apython
+            - link "Remote" [ref=e78] [cursor=pointer]:
+              - /url: /mcp/servers?attributes=hosting%3Aremote-capable
+      - main [ref=e79]:
+        - heading "Related Servers" [level=1] [ref=e80]
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - heading "Alternatives to outlook-mcp" [level=2] [ref=e83]
+            - button "Suggest Server" [ref=e84] [cursor=pointer]
+          - paragraph [ref=e85]: No user-submitted related servers found.
+          - list
+        - generic [ref=e86]:
+          - heading "Related Servers" [level=2] [ref=e87]
+          - list [ref=e88]:
+            - listitem [ref=e89]:
+              - article [ref=e90]:
+                - generic [ref=e91]:
+                  - generic [ref=e93]:
+                    - generic [ref=e94]:
+                      - heading [level=2] [ref=e95]:
+                        - link "lab-mcp-identity-server" [ref=e96] [cursor=pointer]:
+                          - /url: /mcp/servers/fso-datawarrior/lab-mcp-identity-server
+                      - navigation "Categories" [ref=e97]:
+                        - link "Security" [ref=e98] [cursor=pointer]:
+                          - /url: /mcp/categories/security-and-iam
+                        - link "Cloud Platforms" [ref=e102] [cursor=pointer]:
+                          - /url: /mcp/categories/cloud-platforms
+                    - link "fso-datawarrior" [ref=e107] [cursor=pointer]:
+                      - /url: /mcp/servers?query=author%3Afso-datawarrior
+                  - generic [ref=e108]:
+                    - generic [ref=e109]:
+                      - generic [ref=e110]: A
+                      - generic [ref=e111]: license
+                    - generic [ref=e112]:
+                      - generic [ref=e113]: A
+                      - generic [ref=e114]: quality
+                    - generic [ref=e115]:
+                      - generic [ref=e116]: B
+                      - generic [ref=e117]: maintenance
+                  - generic [ref=e118]: MCP server that lets an AI assistant perform scoped Okta identity operations with an out-of-band human-approval gate on destructive actions.
+                  - generic [ref=e119]:
+                    - time [ref=e120]:
+                      - text: Updated a month ago
+                      - generic [ref=e123]: (2026-07-16 16:49 UTC)
+                    - generic [ref=e124]: "5"
+                - generic [ref=e128]:
+                  - generic "License" [ref=e129]: MIT
+                  - list [ref=e132]:
+                    - listitem [ref=e133]
+                    - listitem [ref=e136]
+                    - listitem [ref=e139]
+            - listitem [ref=e142]:
+              - article [ref=e143]:
+                - generic [ref=e144]:
+                  - generic [ref=e146]:
+                    - generic [ref=e147]:
+                      - heading [level=2] [ref=e148]:
+                        - link "Vizdown-MCP" [ref=e149] [cursor=pointer]:
+                          - /url: /mcp/servers/rutika196/clarity-beta
+                      - navigation "Categories" [ref=e150]:
+                        - link "Software Architecture" [ref=e151] [cursor=pointer]:
+                          - /url: /mcp/categories/software-architecture
+                        - link "Developer Tools" [ref=e155] [cursor=pointer]:
+                          - /url: /mcp/categories/developer-tools
+                        - link "App Automation" [ref=e159] [cursor=pointer]:
+                          - /url: /mcp/categories/app-automation
+                    - link "rutika196" [ref=e164] [cursor=pointer]:
+                      - /url: /mcp/servers?query=author%3Arutika196
+                  - generic [ref=e165]:
+                    - generic [ref=e166]:
+                      - generic [ref=e167]: A
+                      - generic [ref=e168]: license
+                    - generic [ref=e169]:
+                      - generic [ref=e170]: A
+                      - generic [ref=e171]: quality
+                    - generic [ref=e172]:
+                      - generic [ref=e173]: D
+                      - generic [ref=e174]: maintenance
+                  - generic [ref=e175]: Converts Markdown files into professional diagrams such as flowcharts, mind maps, and architecture diagrams using Mermaid.js and custom SVG renderers. It enables users to list, render, and export visualizations in multiple formats including SVG, PNG, and PDF.
+                  - generic [ref=e176]:
+                    - time [ref=e177]:
+                      - text: Updated 5 months ago
+                      - generic [ref=e180]: (2026-03-16 18:39 UTC)
+                    - generic [ref=e181]: "3"
+                - generic [ref=e185]:
+                  - generic "License" [ref=e186]: MIT
+                  - list [ref=e189]:
+                    - listitem [ref=e190]
+                    - listitem [ref=e193]
+                    - listitem [ref=e196]
+            - listitem [ref=e199]:
+              - article [ref=e200]:
+                - generic [ref=e201]:
+                  - generic [ref=e203]:
+                    - generic [ref=e204]:
+                      - heading [level=2] [ref=e205]:
+                        - link "Ghost MCP Server" [ref=e206] [cursor=pointer]:
+                          - /url: /mcp/servers/salemaziel/ghost-cms-mcp-remote
+                      - navigation "Categories" [ref=e207]:
+                        - link "Content Management Systems" [ref=e208] [cursor=pointer]:
+                          - /url: /mcp/categories/content-management-systems
+                        - link "Marketing" [ref=e212] [cursor=pointer]:
+                          - /url: /mcp/categories/marketing
+                    - link "salemaziel" [ref=e217] [cursor=pointer]:
+                      - /url: /mcp/servers?query=author%3Asalemaziel
+                  - generic [ref=e218]:
+                    - generic [ref=e219]:
+                      - generic [ref=e220]: A
+                      - generic [ref=e221]: license
+                    - generic [ref=e222]:
+                      - generic [ref=e223]: "-"
+                      - generic [ref=e224]: quality
+                    - generic [ref=e225]:
+                      - generic [ref=e226]: D
+                      - generic [ref=e227]: maintenance
+                  - generic [ref=e228]: Enables to manage Ghost CMS instance using LLM interfaces. Supports comprehensive CRUD operations on posts, members, newsletters, offers, tags, tiers, users, and webhooks.
+                  - generic [ref=e229]:
+                    - time [ref=e230]:
+                      - text: Updated 7 months ago
+                      - generic [ref=e233]: (2026-01-28 03:38 UTC)
+                    - generic [ref=e234]: "10"
+                - generic [ref=e238]:
+                  - generic "License" [ref=e239]: MIT
+                  - list [ref=e242]:
+                    - listitem [ref=e243]
+                    - listitem [ref=e246]
+                    - listitem [ref=e249]
+            - listitem [ref=e252]:
+              - article [ref=e253]:
+                - generic [ref=e254]:
+                  - generic [ref=e256]:
+                    - generic [ref=e257]:
+                      - heading [level=2] [ref=e258]:
+                        - link "tableau-mcp-navi" [ref=e259] [cursor=pointer]:
+                          - /url: /mcp/servers/manish-coder-1007/tableau-mcp-navi
+                      - navigation "Categories" [ref=e260]:
+                        - link "Data Visualization" [ref=e261] [cursor=pointer]:
+                          - /url: /mcp/categories/data-visualization
+                        - link "Search" [ref=e265] [cursor=pointer]:
+                          - /url: /mcp/categories/search
+                    - link "manish-coder-1007" [ref=e270] [cursor=pointer]:
+                      - /url: /mcp/servers?query=author%3Amanish-coder-1007
+                  - generic [ref=e271]:
+                    - generic [ref=e272]:
+                      - generic [ref=e273]: A
+                      - generic [ref=e274]: license
+                    - generic [ref=e275]:
+                      - generic [ref=e276]: A
+                      - generic [ref=e277]: quality
+                    - generic [ref=e278]:
+                      - generic [ref=e279]: C
+                      - generic [ref=e280]: maintenance
+                  - generic [ref=e281]: A Model Context Protocol (MCP) server for Tableau Server. Enables AI assistants to interact with Tableau workbooks, views, datasources, and metadata.
+                  - generic [ref=e282]:
+                    - time [ref=e283]:
+                      - text: Updated 7 months ago
+                      - generic [ref=e286]: (2026-01-08 11:27 UTC)
+                    - generic [ref=e287]: "24"
+                - generic [ref=e291]:
+                  - generic "License" [ref=e292]: MIT
+                  - list [ref=e295]:
+                    - listitem [ref=e296]
+                    - listitem [ref=e299]
+                    - listitem [ref=e302]
+            - listitem [ref=e305]:
+              - article [ref=e306]:
+                - generic [ref=e307]:
+                  - generic [ref=e309]:
+                    - generic [ref=e310]:
+                      - heading [level=2] [ref=e311]:
+                        - link "blender-mcp" [ref=e312] [cursor=pointer]:
+                          - /url: /mcp/servers/kleer001/blender-mcp
+                      - navigation "Categories" [ref=e313]:
+                        - link "Design Tools" [ref=e314] [cursor=pointer]:
+                          - /url: /mcp/categories/design-tools
+                        - link "Image & Video Processing" [ref=e318] [cursor=pointer]:
+                          - /url: /mcp/categories/image-and-video-processing
+                        - link "Multimedia Processing" [ref=e322] [cursor=pointer]:
+                          - /url: /mcp/categories/multimedia-processing
+                    - link "kleer001" [ref=e327] [cursor=pointer]:
+                      - /url: /mcp/servers?query=author%3Akleer001
+                  - generic [ref=e328]:
+                    - generic [ref=e329]:
+                      - generic [ref=e330]: A
+                      - generic [ref=e331]: license
+                    - generic [ref=e332]:
+                      - generic [ref=e333]: C
+                      - generic [ref=e334]: quality
+                    - generic [ref=e335]:
+                      - generic [ref=e336]: C
+                      - generic [ref=e337]: maintenance
+                  - generic [ref=e338]: MCP server that enables AI to control Blender 3D, providing 175 typed tools for objects, materials, animation, compositing, and more via the Model Context Protocol.
+                  - generic [ref=e339]:
+                    - time [ref=e340]:
+                      - text: Updated 2 months ago
+                      - generic [ref=e343]: (2026-06-04 17:42 UTC)
+                    - generic [ref=e344]:
+                      - generic [ref=e345]: "100"
+                      - generic [ref=e348]: "2"
+                - generic "License" [ref=e352]: MIT
+            - listitem [ref=e355]:
+              - article [ref=e356]:
+                - generic [ref=e357]:
+                  - generic [ref=e359]:
+                    - generic [ref=e360]:
+                      - heading [level=2] [ref=e361]:
+                        - link "Drand" [ref=e362] [cursor=pointer]:
+                          - /url: /mcp/servers/xiaobenyang-com/1777316659468291
+                      - navigation "Categories" [ref=e363]:
+                        - link "Entertainment & Media" [ref=e364] [cursor=pointer]:
+                          - /url: /mcp/categories/entertainment-and-media
+                    - link "xiaobenyang-com" [ref=e369] [cursor=pointer]:
+                      - /url: /mcp/servers?query=author%3Axiaobenyang-com
+                  - generic [ref=e370]:
+                    - generic [ref=e371]:
+                      - generic [ref=e372]: A
+                      - generic [ref=e373]: license
+                    - generic [ref=e374]:
+                      - generic [ref=e375]: B
+                      - generic [ref=e376]: quality
+                    - generic [ref=e377]:
+                      - generic [ref=e378]: D
+                      - generic [ref=e379]: maintenance
+                  - generic [ref=e380]: drand-mcp-server is a service that provides verifiable random numbers for model-driven processes in AI applications, supporting the acquisition of random numbers by time or round.
+                  - generic [ref=e381]:
+                    - time [ref=e382]:
+                      - text: Updated 7 months ago
+                      - generic [ref=e385]: (2026-01-09 07:05 UTC)
+                    - generic [ref=e386]:
+                      - generic [ref=e387]: "3"
+                      - generic [ref=e390]: "2"
+                - generic "License" [ref=e394]: Apache 2.0
+      - generic [ref=e397]:
+        - heading "Latest Blog Posts" [level=2] [ref=e398]
+        - list [ref=e399]:
+          - listitem [ref=e400]:
+            - generic [ref=e401]:
+              - link "Who's Calling? MCP Hosts Are an Identity Blind Spot (And the Spec Knows It)" [ref=e402] [cursor=pointer]:
+                - /url: /blog/2026-07-25-who-is-calling-mcp-hosts-are-an-identity-blind-spot-and-the-spec-knows-it
+              - generic [ref=e403]:
+                - text: By
+                - link "Om-Shree-0709" [ref=e404] [cursor=pointer]:
+                  - /url: https://github.com/Om-Shree-0709
+                - text: "on"
+                - time [ref=e406]: July 25, 2026
+                - text: .
+              - generic [ref=e407]:
+                - generic [ref=e408]: mcp
+                - generic [ref=e409]: Agent Identity
+                - generic [ref=e410]: OAuth 2.1
+          - listitem [ref=e411]:
+            - generic [ref=e412]:
+              - link "Your AI Chatbot Just Exposed Your CEO's Salary to an Intern" [ref=e413] [cursor=pointer]:
+                - /url: /blog/2026-06-29-your-ai-chatbot-just-exposed-your-ceos-salary-to-an-intern
+              - generic [ref=e414]:
+                - text: By
+                - link "Om-Shree-0709" [ref=e415] [cursor=pointer]:
+                  - /url: https://github.com/Om-Shree-0709
+                - text: "on"
+                - time [ref=e417]: July 2, 2026
+                - text: .
+              - generic [ref=e418]:
+                - generic [ref=e419]: Agent Identity
+                - generic [ref=e420]: MCP Security
+                - generic [ref=e421]: OAuth Delegation
+          - listitem [ref=e422]:
+            - generic [ref=e423]:
+              - link "Why MCP Servers Need Execution Sandboxing (And Why Your Current Stack Isn't Enough)" [ref=e424] [cursor=pointer]:
+                - /url: /blog/2026-06-30-why-mcp-servers-need-execution-sandboxing-and-why-your-current-stack-is-not-enough
+              - generic [ref=e425]:
+                - text: By
+                - link "Om-Shree-0709" [ref=e426] [cursor=pointer]:
+                  - /url: https://github.com/Om-Shree-0709
+                - text: "on"
+                - time [ref=e428]: June 30, 2026
+                - text: .
+              - generic [ref=e429]:
+                - generic [ref=e430]: Agentic Ai
+                - generic [ref=e431]: Prompt Injection
+                - generic [ref=e432]: WebAssembly
+      - generic [ref=e433]:
+        - heading "MCP directory API" [level=4] [ref=e434]
+        - generic [ref=e435]:
+          - paragraph [ref=e436]:
+            - text: We provide all the information about MCP servers via our
+            - link "MCP API" [ref=e437] [cursor=pointer]:
+              - /url: /mcp/reference
+            - text: .
+          - generic [ref=e438]: curl -X GET 'https://glama.ai/api/mcp/v1/servers/ma2no4413/outlook-mcp'
+          - paragraph [ref=e439]:
+            - text: If you have feedback or need assistance with the MCP directory API, please join our
+            - link "Discord server" [ref=e440] [cursor=pointer]:
+              - /url: /discord
+    - contentinfo "Footer" [ref=e441]:
+      - region "Feedback" [ref=e442]:
+        - generic [ref=e443]: Was this helpful?
+        - generic [ref=e444]:
+          - button "Yes" [ref=e445] [cursor=pointer]
+          - button "No" [ref=e446] [cursor=pointer]
+      - navigation "Footer navigation" [ref=e447]:
+        - generic [ref=e448]:
+          - generic [ref=e449]: MCP
+          - list [ref=e450]:
+            - listitem [ref=e451]:
+              - link "MCP Servers" [ref=e452] [cursor=pointer]:
+                - /url: /mcp/servers
+            - listitem [ref=e453]:
+              - link "MCP Connectors" [ref=e454] [cursor=pointer]:
+                - /url: /mcp/connectors
+            - listitem [ref=e455]:
+              - link "MCP Gateway" [ref=e456] [cursor=pointer]:
+                - /url: /mcp/gateway
+            - listitem [ref=e457]:
+              - link "MCP Hosting" [ref=e458] [cursor=pointer]:
+                - /url: /mcp/hosting
+            - listitem [ref=e459]:
+              - link "MCP Inspector" [ref=e460] [cursor=pointer]:
+                - /url: /mcp/inspector
+            - listitem [ref=e461]:
+              - link "MCP Clients" [ref=e462] [cursor=pointer]:
+                - /url: /mcp/clients
+            - listitem [ref=e463]:
+              - link "MCP Tools" [ref=e464] [cursor=pointer]:
+                - /url: /mcp/tools
+        - generic [ref=e465]:
+          - generic [ref=e466]: AI
+          - list [ref=e467]:
+            - listitem [ref=e468]:
+              - link "Chat" [ref=e469] [cursor=pointer]:
+                - /url: /chat
+            - listitem [ref=e470]:
+              - link "AI Gateway" [ref=e471] [cursor=pointer]:
+                - /url: /ai/gateway
+            - listitem [ref=e472]:
+              - link "AI Models" [ref=e473] [cursor=pointer]:
+                - /url: /ai/models
+        - generic [ref=e474]:
+          - generic [ref=e475]: Policies
+          - list [ref=e476]:
+            - listitem [ref=e477]:
+              - link "Terms of Service" [ref=e478] [cursor=pointer]:
+                - /url: /policies/terms-of-service
+            - listitem [ref=e479]:
+              - link "Privacy Policy" [ref=e480] [cursor=pointer]:
+                - /url: /policies/privacy-policy
+            - listitem [ref=e481]:
+              - link "VDP" [ref=e482] [cursor=pointer]:
+                - /url: /policies/vulnerability-disclosure
+        - generic [ref=e483]:
+          - generic [ref=e484]: Resources
+          - list [ref=e485]:
+            - listitem [ref=e486]:
+              - link "Release Notes" [ref=e487] [cursor=pointer]:
+                - /url: /release-notes
+            - listitem [ref=e488]:
+              - link "Support" [ref=e489] [cursor=pointer]:
+                - /url: /support
+            - listitem [ref=e490]:
+              - link "Pricing" [ref=e491] [cursor=pointer]:
+                - /url: /pricing
+            - listitem [ref=e492]:
+              - link "Careers" [ref=e493] [cursor=pointer]:
+                - /url: /careers
+            - listitem [ref=e494]:
+              - link "Blog" [ref=e495] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e496]:
+              - link "Newsletter" [ref=e497] [cursor=pointer]:
+                - /url: /newsletter
+      - region "Company information and social media" [ref=e498]:
+        - generic [ref=e499]:
+          - link "Glama" [ref=e500] [cursor=pointer]:
+            - /url: /
+          - text: – all-in-one AI workspace.
+        - generic [ref=e501]:
+          - link "All systems online" [ref=e502] [cursor=pointer]:
+            - /url: /status
+          - link "Join our Discord community" [ref=e507] [cursor=pointer]:
+            - /url: /discord
+          - link "Join our Reddit community" [ref=e510] [cursor=pointer]:
+            - /url: https://reddit.com/r/glama
+          - link "Follow us on X" [ref=e513] [cursor=pointer]:
+            - /url: https://x.com/glama_ai

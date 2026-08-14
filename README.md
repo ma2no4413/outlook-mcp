@@ -16,19 +16,25 @@ Works with personal Hotmail / Outlook.com accounts as well as work and school ac
 
 ---
 
-## Why another Outlook MCP server?
+## What makes this one different
 
-Most Microsoft 365 MCP servers aim for **full coverage** — mail, calendar, contacts, Teams, files — and they can send mail on your behalf. That is a reasonable goal, and if you want it, those servers are a better fit than this one.
+Outlook MCP servers are not scarce. Several cover the whole Microsoft 365 surface — mail, calendar, contacts, Teams — and send on your behalf. And at least one other server has independently landed on the same refusal to send, writing drafts instead. That is the right call, and it deserves saying rather than glossing over.
 
-This server is scoped to a different job: **triaging and reorganising a mailbox that has decades of mail in it**, with the blast radius reduced on purpose.
+So here is the honest version. What this server has that I have not found elsewhere:
+
+| | |
+|---|---|
+| **Folder-tree surgery** | `move_folder` relocates an entire subtree. Thousands of messages change place in **one API call**, every message ID stays valid, and inbox rules pointing at that folder keep working. Other servers create folders; this one restructures the tree. |
+| **Inbox rules as first-class tools** | Read, create and delete server-side rules. Rules you made in the Outlook web UI are parsed correctly too — including the `fromAddresses` shape the UI writes, which is not the shape the API accepts when creating one. |
+| **A global write kill-switch** | `OUTLOOK_READONLY=true` disables every write tool at once, for when you want to let an agent look but not touch. |
+
+And the properties it shares with the better servers in this space — worth stating plainly, whoever got there first:
 
 | | |
 |---|---|
 | **Cannot send.** | No send tool exists and `Mail.Send` is never requested. Not a flag you can flip — the token itself lacks the permission. It writes drafts instead. |
 | **Cannot permanently delete.** | Deletion means "move to Deleted Items". Recoverable, always. |
-| **Moves shelves, not mail.** | `move_folder` relocates a whole folder subtree without touching a single message. Reorganising tens of thousands of messages costs a handful of API calls. |
 | **Bulk work previews first.** | `move_by_search` and `mark_read_by_search` default to `dry_run=True` and just count. You see the number before anything moves. |
-| **Read-only mode.** | `OUTLOOK_READONLY=true` disables every write tool at once. |
 
 It has been exercised on a real mailbox of roughly 40,000 messages: a 270-folder tree collapsed to 9 top-level folders, an inbox of 140 emptied by sender, and 14,617 messages marked read in a single run.
 
@@ -46,6 +52,13 @@ against this is the absence of the capability — enforced at the identity layer
 Because `Mail.Send` is never consented to, even a completely hijacked agent has no route out.
 
 Draft creation needs no additional permission, so you still get "write my reply" without opening that door.
+
+### Alternatives
+
+If this one does not fit, these might. Both are worth your time:
+
+- **[littlebearapps/outlook-mcp](https://github.com/littlebearapps/outlook-mcp)** — full coverage including calendar and contacts, and it does send, guarded by dry-run previews, rate limiting and a recipient allowlist. Reach for this if you want one server for all of Outlook.
+- **[ajs117/outlook-mcp](https://github.com/ajs117/outlook-mcp)** — also personal-account focused, also refuses to send, and has newsletter discovery with RFC 8058 one-click unsubscribe, which this server does not. Its `bulk_by_query` keeps message IDs out of the conversation entirely, which is a neat trick.
 
 ---
 
