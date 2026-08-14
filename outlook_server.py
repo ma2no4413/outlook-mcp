@@ -17,6 +17,7 @@ Microsoft Graph API を叩く。要求する権限は Mail.ReadWrite だけで�
 from __future__ import annotations
 
 import functools
+import logging
 import os
 import re
 import time
@@ -35,6 +36,13 @@ MAX_RESULTS = 50  # 1回の検索で返す上限
 MAX_IDS_PER_CALL = 25  # 1回の書き込み操作で触れる上限(誤爆の被害を有限にする)
 MAX_BODY_CHARS = 6000  # 本文の切り詰め
 FOLDER_CACHE_TTL = 60.0  # 秒
+
+# httpx は INFO で「GET https://graph.microsoft.com/v1.0/me/mailFolders/{id}/messages」の
+# ように URL 全体を stderr へ出す。この {id} にはフォルダIDやメッセージIDが入るため、
+# stdioサーバのログ・ターミナル・テストのエビデンスにメールボックスの識別子が漏れる。
+# 診断に要るのは失敗したときだけなので WARNING 以上に落とす。
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 BATCH_SIZE = 20  # Graph の /$batch が1リクエストで受ける上限
 MAX_BULK_MESSAGES = 2000  # move_by_search が1回で動かす上限
