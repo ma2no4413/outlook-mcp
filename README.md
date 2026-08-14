@@ -2,11 +2,9 @@
 
 Hotmail / Outlook.com のメールボックスを、AIエージェントから自然言語で検索・整理できるようにする MCP サーバです。
 
-```
-あなた: 先月のAmazonからのメール、未読のやつを「買い物」フォルダにまとめて
-Claude: (search_messages → list_folders → move_messages を自動で呼ぶ)
-        7月のAmazonからの未読12件を「受信トレイ/買い物」へ移動しました。
-```
+<p align="center">
+  <img src="docs/images/hero.svg" alt="受信トレイ140件を差出人ごとに振り分け、0件にするまでのやり取り" width="900">
+</p>
 
 Microsoft Graph API を使います。**メールの送信はできません。完全削除もできません。**
 
@@ -49,20 +47,31 @@ Claude: 140件を確認しました。ぐるなび9件→06_Shop/Meal/ぐるな�
 
 `move_folder` は**メールを1通も動かさずに**棚ごと階層を変えます。数万通の再編が数十回のAPI呼び出しで終わります。
 
-```
-あなた: もう見ていない領域を 99_Archive にまとめて
-Claude: Music / Communication / Game / Employment を 99_Archive の下へ移しました
-        (約10,100通、メールは無変更)。
+<img src="docs/images/usecase-reorg.svg" alt="使わなくなったフォルダ群を棚ごと 99_Archive へ退避するやり取り" width="900">
+
+なぜ速いのかは、やり方を比べると分かります。
+
+```mermaid
+flowchart TD
+    Q["Music フォルダ 6,193通 を<br/>99_Archive の下へ移したい"]
+    Q --> A["move_messages を繰り返す"]
+    Q --> B["move_folder を1回呼ぶ"]
+    A --> A1["25件ずつ = 248回の呼び出し<br/>全メールのIDが失効する<br/>途中で失敗すると中途半端に散らばる"]
+    B --> B1["フォルダの親を変えるだけ = 1回<br/>メールは1通も動かない<br/>IDも失効しない"]
+
+    classDef ask fill:#1f6feb,stroke:#388bfd,color:#ffffff
+    classDef bad fill:#6e2f2f,stroke:#f85149,color:#ffffff
+    classDef good fill:#1a5c2e,stroke:#2ea043,color:#ffffff
+    class Q ask
+    class A,A1 bad
+    class B,B1 good
 ```
 
 ### 一日分のメールから有益な情報だけ拾う
 
-```
-あなた: 8月1日に届いたメールで有益なものをピックアップして
-Claude: 76件のうち実質的なものは6件でした。
-        後藤達也「Amazon/Apple 決算明暗の構図」— Amazonが設備投資を2200億ドルへ引き上げ…
-        楽天銀行 8月優遇金利 0.38%、8月3日から +0.10% 改定予定 …
-```
+読み取りだけの操作なので、メールボックスは一切変わりません。
+
+<img src="docs/images/usecase-digest.svg" alt="一日分の受信メールから実質的な情報だけを要約するやり取り" width="900">
 
 ### 溜まる一方の購読を仕分ける
 
@@ -105,7 +114,26 @@ Claude: 格納のみ・既読化なしのルールを作りました。ヘッダ
 
 **必要なもの**: Python 3.10以上、Microsoftアカウント、Claude Code(または他のMCPクライアント)
 
-作業は2つに分かれています。**人がやるのは1だけ**です。
+**あなたが手を動かすのは、Azure登録と、途中1回のログインだけ**です。残りは Claude Code が進めます。
+
+```mermaid
+flowchart TD
+    A["Azure でアプリを登録<br/>クライアントID を発行"]:::human
+    B["リポジトリを clone"]:::human
+    C["Claude Code に一言<br/>「SETUP-FOR-CLAUDE.md を読んでセットアップして」"]:::human
+    D["仮想環境 / 依存関係 / .env の作成"]:::agent
+    E["login.py を実行しブラウザでサインイン<br/>device code flow はエージェントに完了できない"]:::human
+    F["MCP に登録 / check_config で疎通確認"]:::agent
+    G["使えるようになる"]:::done
+
+    A --> B --> C --> D --> E --> F --> G
+
+    classDef human fill:#1f6feb,stroke:#388bfd,color:#ffffff
+    classDef agent fill:#8957e5,stroke:#a371f7,color:#ffffff
+    classDef done fill:#1a5c2e,stroke:#2ea043,color:#ffffff
+```
+
+<sub>青 = あなた / 紫 = Claude Code</sub>
 
 ### 1. Azure でアプリを登録する(人の手・初回のみ)
 

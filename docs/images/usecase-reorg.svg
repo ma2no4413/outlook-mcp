@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-label="使わなくなったフォルダ群を棚ごと 99_Archive へ退避し、メールを1通も動かさずに約1万通を片付けるターミナル画面">
+  <style>
+    .t { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Noto Sans JP", monospace; font-size: 13.5px; }
+    .you  { fill: #7ee787; }
+    .cc   { fill: #d2a8ff; }
+    .tool { fill: #8b949e; }
+    .txt  { fill: #c9d1d9; }
+    .num  { fill: #79c0ff; }
+    .ok   { fill: #7ee787; font-weight: 700; }
+    .dim  { fill: #6e7681; }
+    .cap  { fill: #8b949e; font-size: 11.5px; }
+  </style>
+
+  <rect x="0" y="0" width="900" height="360" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <path d="M0 10a10 10 0 0 1 10-10h880a10 10 0 0 1 10 10v26H0z" fill="#161b22"/>
+  <line x1="0" y1="36" x2="900" y2="36" stroke="#30363d" stroke-width="1"/>
+  <circle cx="20" cy="18" r="5.5" fill="#ff5f57"/>
+  <circle cx="40" cy="18" r="5.5" fill="#febc2e"/>
+  <circle cx="60" cy="18" r="5.5" fill="#28c840"/>
+  <text class="t cap" x="84" y="22">フォルダの再編 — move_folder</text>
+
+  <text class="t you"  x="24" y="72">▸ あなた</text>
+  <text class="t txt"  x="24" y="94">  もう見ていない領域を 99_Archive にまとめて</text>
+
+  <text class="t cc"   x="24" y="132">● Claude</text>
+  <text class="t tool" x="24" y="154">  list_folders()</text>
+  <text class="t txt"  x="24" y="176">  Music / Communication / Game / Employment は未読がほぼゼロで、</text>
+  <text class="t txt"  x="24" y="196">  数年触られていません。棚ごと移します。</text>
+
+  <text class="t tool" x="24" y="232">  move_folder(folder="Music", parent="99_Archive")</text>
+  <text class="t dim"  x="24" y="252">    Music を 99_Archive の下へ移しました(サブフォルダごと)。</text>
+  <text class="t tool" x="24" y="274">  move_folder(folder="Communication", parent="99_Archive")  … ほか2件</text>
+
+  <text class="t txt"  x="24" y="310">  約 <tspan class="num">10,100通</tspan> を退避。<tspan class="ok">メールは1通も動いていません。</tspan></text>
+  <text class="t cap"  x="24" y="336">棚ごと移すため、API呼び出しは4回だけ。1通ずつ動かすと数千回かかります。</text>
+</svg>
