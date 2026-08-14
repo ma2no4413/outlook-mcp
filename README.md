@@ -4,6 +4,10 @@ English | <a href="README.ja.md">日本語</a>
 
 # outlook-mcp
 
+[![CI](https://github.com/ma2no4413/outlook-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/ma2no4413/outlook-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+
 **An MCP server for cleaning up a large Outlook mailbox — built so that it cannot send email on your behalf, and cannot permanently delete anything.**
 
 It will happily write your reply. It leaves it in Drafts, and pressing send stays your decision.

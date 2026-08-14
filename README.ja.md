@@ -4,6 +4,10 @@
 
 # outlook-mcp
 
+[![CI](https://github.com/ma2no4413/outlook-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/ma2no4413/outlook-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+
 Hotmail / Outlook.com のメールボックスを、AIエージェントから自然言語で検索・整理できるようにする MCP サーバです。
 
 > こちらが詳しい方のドキュメントです。英語版([README.md](README.md))は入口として短く保っています。
