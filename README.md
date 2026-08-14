@@ -292,7 +292,7 @@ create_rule(name="Meta広告の領収書", from_contains="facebookmail.com",
 
 ## ドキュメント
 
-| | 読む人 | 内容 |
+| | 対象読者 | 内容 |
 |---|---|---|
 | このREADME | 人間 | 機能・ユースケース・設計方針・ツール一覧 |
 | [docs/AZURE.md](docs/AZURE.md) | 人間 | Azureアプリ登録(唯一の手作業) |
