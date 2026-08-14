@@ -10,3 +10,6 @@ unread-backup.json
 
 # Claude Code の個人設定(パーミッション許可などを含むためコミットしない)
 .claude/settings.local.json
+
+# Playwright MCP の作業ファイル(ページスナップショット・コンソールログ)
+.playwright-mcp/
