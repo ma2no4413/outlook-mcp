@@ -1,334 +1,186 @@
+<div align="right">
+English | <a href="README.ja.md">日本語</a>
+</div>
+
 # outlook-mcp
 
-Hotmail / Outlook.com のメールボックスを、AIエージェントから自然言語で検索・整理できるようにする MCP サーバです。
+**An MCP server for cleaning up a large Outlook mailbox — one that cannot send email and cannot permanently delete anything.**
+
+Works with personal Hotmail / Outlook.com accounts as well as work and school accounts, through the Microsoft Graph API.
 
 <p align="center">
-  <img src="docs/images/hero.svg" alt="受信トレイ140件を差出人ごとに振り分け、0件にするまでのやり取り" width="900">
+  <img src="docs/images/hero.en.svg" alt="Sorting 140 inbox messages by sender into existing folders, leaving the inbox empty" width="900">
 </p>
-
-Microsoft Graph API を使います。**メールの送信はできません。完全削除もできません。**
 
 ---
 
-## できること / できないこと
+## Why another Outlook MCP server?
+
+Most Microsoft 365 MCP servers aim for **full coverage** — mail, calendar, contacts, Teams, files — and they can send mail on your behalf. That is a reasonable goal, and if you want it, those servers are a better fit than this one.
+
+This server is scoped to a different job: **triaging and reorganising a mailbox that has decades of mail in it**, with the blast radius reduced on purpose.
 
 | | |
 |---|---|
-| ✅ 検索 | 件名・本文・差出人・期間・未読で絞り込み |
-| ✅ 読む | 本文の取得(HTMLメールは平文に変換) |
-| ✅ 整理 | フォルダ移動、アーカイブ、既読/未読の切り替え |
-| ✅ 一括整理 | 条件に一致するメールをまとめて移動・既読化(下見つき) |
-| ✅ 棚の再編 | フォルダの作成・改名・移動・削除 |
-| ✅ 自動振分 | Outlook側のルールを作る(MCPが起動していなくても効く) |
-| ✅ 捨てる | ゴミ箱へ移動(**元に戻せます**) |
-| ❌ 送信 | 実装していません。`Mail.Send` 権限を要求しません |
-| ❌ 完全削除 | 実装していません。取り返しがつかないため |
-| ❌ 添付の取得 | 未実装(添付の有無は 📎 で表示されます) |
+| **Cannot send.** | There is no send, reply, or forward tool, and `Mail.Send` is never requested. Not a flag you can flip — the capability does not exist. |
+| **Cannot permanently delete.** | Deletion means "move to Deleted Items". Recoverable, always. |
+| **Moves shelves, not mail.** | `move_folder` relocates a whole folder subtree without touching a single message. Reorganising tens of thousands of messages costs a handful of API calls. |
+| **Bulk work previews first.** | `move_by_search` and `mark_read_by_search` default to `dry_run=True` and just count. You see the number before anything moves. |
+| **Read-only mode.** | `OUTLOOK_READONLY=true` disables every write tool at once. |
 
-要求する権限は **`Mail.ReadWrite`** と **`MailboxSettings.ReadWrite`**(振分ルール用)の2つだけです。
+It has been exercised on a real mailbox of roughly 40,000 messages: a 270-folder tree collapsed to 9 top-level folders, an inbox of 140 emptied by sender, and 14,617 messages marked read in a single run.
 
 ---
 
-## ユースケース
+## What it can and cannot do
 
-実際に4万通・274フォルダのメールボックスで通した作業です。
+| | |
+|---|---|
+| ✅ Search | subject, body, sender, date range, unread, folder |
+| ✅ Read | message bodies, HTML converted to readable plain text |
+| ✅ Organise | move, archive, mark read/unread |
+| ✅ Bulk | move or mark read in batches, with a dry run first |
+| ✅ Folder surgery | create, rename, move, delete folders |
+| ✅ Inbox rules | create server-side rules that keep working when this server is not running |
+| ✅ Discard | move to Deleted Items (**recoverable**) |
+| ❌ Send | not implemented; `Mail.Send` is never requested |
+| ❌ Permanent delete | not implemented, on purpose |
+| ❌ Attachments | not implemented (presence is shown with 📎) |
 
-### 受信トレイを空にする
-
-差出人ごとに既存フォルダへ流し込みます。フォルダが無ければ作ります。
-
-```
-あなた: 受信トレイを差出人ごとに振り分けて空にして
-Claude: 140件を確認しました。〇〇グルメ9件→06_Shop/Meal/〇〇グルメ、
-        〇〇証券6件→02_Invest/〇〇証券、… 全140件を振り分けます。
-```
-
-### 何年も溜まったフォルダを再編する
-
-`move_folder` は**メールを1通も動かさずに**棚ごと階層を変えます。数万通の再編が数十回のAPI呼び出しで終わります。
-
-<img src="docs/images/usecase-reorg.svg" alt="使わなくなったフォルダ群を棚ごと 99_Archive へ退避するやり取り" width="900">
-
-なぜ速いのかは、やり方を比べると分かります。
-
-```mermaid
-flowchart TD
-    Q["Newsletters フォルダ 6,000通 を<br/>99_Archive の下へ移したい"]
-    Q --> A["move_messages を繰り返す"]
-    Q --> B["move_folder を1回呼ぶ"]
-    A --> A1["25件ずつ = 240回の呼び出し<br/>全メールのIDが失効する<br/>途中で失敗すると中途半端に散らばる"]
-    B --> B1["フォルダの親を変えるだけ = 1回<br/>メールは1通も動かない<br/>IDも失効しない"]
-
-    classDef ask fill:#1f6feb,stroke:#388bfd,color:#ffffff
-    classDef bad fill:#6e2f2f,stroke:#f85149,color:#ffffff
-    classDef good fill:#1a5c2e,stroke:#2ea043,color:#ffffff
-    class Q ask
-    class A,A1 bad
-    class B,B1 good
-```
-
-### 一日分のメールから有益な情報だけ拾う
-
-読み取りだけの操作なので、メールボックスは一切変わりません。
-
-<img src="docs/images/usecase-digest.svg" alt="一日分の受信メールから実質的な情報だけを要約するやり取り" width="900">
-
-### 溜まる一方の購読を仕分ける
-
-`create_rule` は Outlook サーバ側にルールを作るので、**MCPが起動していなくても24時間効きます**。
-
-```
-あなた: この差出人、今後は自動でこのフォルダに入れて
-Claude: ルール「クラウドの請求書」を作成しました(適用順 33)。
-        今後届く分を 04_Business/請求書 へ移動 + 既読化します。
-        既に届いている分は move_by_search で別途動かせます。
-```
-
-### 記録として保全する
-
-削除ではなく格納だけ、既読にもしない、という指定ができます。未読件数の増加そのものが「継続的に送られてきている」記録になります。
-
-```
-あなた: この差出人は詐欺の疑いがあるので証拠として残したい
-Claude: 格納のみ・既読化なしのルールを作りました。ヘッダはOutlook側に完全な形で残ります。
-```
+Two delegated permissions are requested: **`Mail.ReadWrite`** and **`MailboxSettings.ReadWrite`** (the latter only for inbox rules).
 
 ---
 
-## 設計方針
+## Setup
 
-**AIに受信箱を触らせる**以上、壊せる範囲を先に狭めておくべきだと考えました。
+**Requirements**: Python 3.10+, a Microsoft account, and Claude Code or another MCP client.
 
-- **完全削除の手段を置かない。** ゴミ箱へ移すだけ。ツールとして存在しない操作は、どう指示されても起きません。
-- **一度に触れるのは25件まで。** 誤爆したときの被害を有限にします。大量処理は専用ツールに分け、**下見を既定**にしました。
-- **無条件の一括移動を拒否する。** 絞り込み条件のない `move_by_search` はエラーになります。
-- **システムフォルダを守る。** 受信トレイ・迷惑メール等は改名・移動・削除できません。
-- **空でないフォルダは `force` なしに消せない。** 退避(`move_folder`)で足りるなら、そちらを促します。
-- **`OUTLOOK_READONLY=true` で書き込みを全面停止。** 読み取り専用サーバとして動かせます。
-- **送信権限を要求しない。** 「AIが勝手にメールを出す」経路を原理的に作りません。
-- **`destructive_hint` を正しく申告する。** 対応クライアントは `move_to_trash` を他と区別して扱えます。
+You do two things by hand. Everything else is handled by the agent.
+
+### 1. Register an app in Azure — by hand, once
+
+You need one GUID: an application (client) ID. It is free and does not require an Azure subscription.
+
+This step involves browser sign-in and a consent screen, so do it yourself and read what you are approving — **you are issuing access to your own mailbox**.
+
+→ **[docs/AZURE.en.md](docs/AZURE.en.md)**
+
+It documents two traps that cost real time, both specific to personal Microsoft accounts:
+redirect URIs that must exist even though device code flow never visits them, and a permission that
+does not take effect until you re-consent.
+
+### 2. Everything else — hand it to Claude Code
+
+Clone the repository, start Claude Code in it, and say:
+
+```
+Read docs/SETUP-FOR-CLAUDE.md and set this up
+```
+
+The agent creates the virtual environment, installs dependencies, writes `.env`, registers the MCP
+server, and verifies the connection. It stops once and asks you to run `login.py` yourself, because
+device code flow needs a browser and cannot be completed by an agent.
+
+> **That runbook is written in Japanese.** That is fine — the reader is an agent, and Claude follows
+> it without trouble. If you would rather read it yourself, the [manual steps](README.ja.md#セットアップ)
+> are short.
 
 ---
 
-## セットアップ
+## Tools
 
-**必要なもの**: Python 3.10以上、Microsoftアカウント、Claude Code(または他のMCPクライアント)
-
-**あなたが手を動かすのは、Azure登録と、途中1回のログインだけ**です。残りは Claude Code が進めます。
-
-```mermaid
-flowchart TD
-    A["Azure でアプリを登録<br/>クライアントID を発行"]:::human
-    B["リポジトリを clone"]:::human
-    C["Claude Code に一言<br/>「SETUP-FOR-CLAUDE.md を読んでセットアップして」"]:::human
-    D["仮想環境 / 依存関係 / .env の作成"]:::agent
-    E["login.py を実行しブラウザでサインイン<br/>device code flow はエージェントに完了できない"]:::human
-    F["MCP に登録 / check_config で疎通確認"]:::agent
-    G["使えるようになる"]:::done
-
-    A --> B --> C --> D --> E --> F --> G
-
-    classDef human fill:#1f6feb,stroke:#388bfd,color:#ffffff
-    classDef agent fill:#8957e5,stroke:#a371f7,color:#ffffff
-    classDef done fill:#1a5c2e,stroke:#2ea043,color:#ffffff
-```
-
-<sub>青 = あなた / 紫 = Claude Code</sub>
-
-### 1. Azure でアプリを登録する(人の手・初回のみ)
-
-クライアントIDというGUIDを1個発行します。無料で、Azureのサブスクリプション契約は要りません。
-
-ブラウザでのサインインと同意が絡むため、ここだけは自分の目で確認しながら進めてください。**あなたのメールボックスへのアクセス権を発行する操作**です。
-
-→ **[docs/AZURE.md](docs/AZURE.md)**
-
-### 2. 残り全部(Claude Code に任せる)
-
-リポジトリを clone して Claude Code を起動し、こう言うだけです。
-
-```
-docs/SETUP-FOR-CLAUDE.md を読んでセットアップして
-```
-
-仮想環境の作成、依存関係、`.env`、MCP登録、疎通確認まで自動で進みます。途中1回だけ、**ログインのために手が止まります** — device code flow はブラウザでのサインインを伴うため、エージェントには完了できません。提示されたコマンドを自分で実行してください。
-
-→ 手順書の中身: **[docs/SETUP-FOR-CLAUDE.md](docs/SETUP-FOR-CLAUDE.md)**
-
-<details>
-<summary>手作業で入れたい場合</summary>
-
-```bash
-# macOS / Linux
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-cp .env.example .env          # OUTLOOK_CLIENT_ID を書く
-.venv/bin/python login.py     # ブラウザでコードを入力
-claude mcp add outlook -- /abs/path/.venv/bin/python /abs/path/outlook_server.py
-```
-
-```powershell
-# Windows (PowerShell)
-py -3 -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
-copy .env.example .env
-.venv\Scripts\python.exe login.py
-claude mcp add outlook -- "C:\abs\path\.venv\Scripts\python.exe" "C:\abs\path\outlook_server.py"
-```
-
-パスは**絶対パス**で。Windowsは `bin` ではなく `Scripts`、拡張子つきです。
-つまずいたときの対応表は [docs/SETUP-FOR-CLAUDE.md](docs/SETUP-FOR-CLAUDE.md) にあります。
-
-</details>
-
-つながったら、まず `check_config` を呼ばせてみてください。
-
-```
-あなた: Outlookつながってる?
-Claude: OK: 受信トレイ 3,412件(未読 87件)にアクセスできました。
-        振分ルール: 読み書き可(12件設定済み)
-```
-
----
-
-## ツール
-
-| ツール | 種別 | 説明 |
+| Tool | Kind | What it does |
 |---|---|---|
-| `check_config` | 読取 | 設定・認証・接続の診断 |
-| `list_folders` | 読取 | フォルダ一覧(件数・未読数つき) |
-| `search_messages` | 読取 | 検索。キーワード / 差出人 / 期間 / 未読 / フォルダ |
-| `get_message` | 読取 | 1通の本文と宛先を読む |
-| `list_rules` | 読取 | 設定済みの振分ルールを一覧 |
-| `create_folder` | 書込 | フォルダを作る |
-| `rename_folder` | 書込 | フォルダを改名する(中身は動かない) |
-| `move_folder` | 書込 | フォルダを別の親の下へ移す(中身ごと) |
-| `move_messages` | 書込 | 指定フォルダへ移動(最大25件) |
-| `move_by_search` | 書込 | 条件に一致するメールを一括移動(最大2,000件) |
-| `mark_messages_read` | 書込 | 既読 / 未読の切り替え(最大25件) |
-| `mark_read_by_search` | 書込 | 条件に一致するメールを一括既読化(最大25,000件) |
-| `archive_messages` | 書込 | アーカイブへ移動 |
-| `create_rule` | 書込 | 自動振分ルールを作る |
-| `move_to_trash` | 破壊 | ゴミ箱へ移動(元に戻せる) |
-| `delete_folder` | 破壊 | フォルダを削除(空でなければ `force` が要る) |
-| `delete_rule` | 破壊 | 振分ルールを削除(メールは動かない) |
+| `check_config` | read | diagnose configuration, auth and connectivity |
+| `list_folders` | read | folder tree with item and unread counts |
+| `search_messages` | read | search by keyword, sender, date range, unread, folder |
+| `get_message` | read | one message body and recipients |
+| `list_rules` | read | existing inbox rules |
+| `create_folder` | write | create a folder |
+| `rename_folder` | write | rename a folder, contents untouched |
+| `move_folder` | write | move a folder under a new parent, subtree included |
+| `move_messages` | write | move up to 25 messages |
+| `move_by_search` | write | move everything matching a query, up to 2,000 |
+| `mark_messages_read` | write | toggle read/unread, up to 25 |
+| `mark_read_by_search` | write | mark everything matching a query, up to 25,000 |
+| `archive_messages` | write | move to Archive |
+| `create_rule` | write | create a server-side inbox rule |
+| `move_to_trash` | destructive | move to Deleted Items (recoverable) |
+| `delete_folder` | destructive | delete a folder (`force` required if not empty) |
+| `delete_rule` | destructive | delete an inbox rule (messages untouched) |
 
-### 一括処理 — `move_by_search` / `mark_read_by_search`
+### Moving shelves instead of mail
 
-1件ずつ扱うツールは1回25件です。数千通を動かすために、条件に一致するものをまとめて処理します。
+<img src="docs/images/usecase-reorg.en.svg" alt="Moving whole folder subtrees into an archive without moving individual messages" width="900">
 
-**既定は下見(`dry_run=True`)で、何件動くかを数えるだけです。**
+`move_folder` changes a folder's parent. Messages stay where they are, keep their IDs, and the inbox
+rules that point at that folder keep working — Graph preserves folder IDs across renames and moves.
+Doing the same thing message by message would mean hundreds of calls and would invalidate every ID.
+
+### Bulk operations
+
+Batched 20 at a time through the Graph `/$batch` endpoint, with **per-item status checks**. A batch can
+return HTTP 200 overall while individual entries fail — treating the batch as all-or-nothing would mean
+reprocessing thousands of messages because a handful got throttled. Re-running picks up only what failed.
 
 ```
 move_by_search(dest="99_Archive", folder="Newsletters")
-  → 元: Newsletters / 走査 6,000件 → 該当 6,000件
-    【下見のみ・まだ動かしていません】
+  → scanned 6,000 → matched 6,000
+    [dry run — nothing moved yet]
 
 move_by_search(dest="99_Archive", folder="Newsletters", dry_run=False)
-  → 6,000件を「99_Archive」へ移動しました。
+  → moved 6,000 messages to 99_Archive.
 ```
 
-内部では Graph の `/$batch` に20件ずつ束ねます。1通ずつ叩くと往復回数が現実的でないためです。**レスポンスは1件ずつ status を見ます** — バッチ全体を成否で判定すると、一部がスロットリングされただけで全件を再処理することになるためです。
-
-- `move_by_search` は絞り込み条件を1つも指定しない呼び出しを**拒否**します(メールボックス全体を無条件に動かす事故を防ぐため)
-- `mark_read_by_search` は居場所を変えないため条件なしを許し、上限も緩めてあります。ただし**既読/未読は「まだ見ていない」という情報そのもので、まとめて既読にすると復元できません**
-- 差出人・件名の部分一致は手元で判定します(`$filter` が `contains()` を受け付けないため)。**アドレスと表示名の両方**を見るので、`〇〇グルメ` のような日本語の差出人名でも絞れます
-
-> **棚ごと動かせるなら `move_folder` のほうが速いです。** メールを1通も動かさずに階層だけ変わります。
-
-### 自動振分ルール — `create_rule`
-
-Outlook のサーバ側に保存されるルールです。**このMCPが起動していなくても24時間効きます。**
-
-```
-create_rule(name="クラウドの請求書", from_contains="billing@example.com",
-            subject_contains="請求書", move_to="04_Business/請求書", mark_read=True)
-```
-
-- 条件(`from_contains` / `subject_contains` / `body_contains`)は複数指定すると **AND**。値はカンマ区切りで複数渡せます
-- **既に届いているメールには適用されません。** 過去分は `move_by_search` で別途動かします
-- `to_trash` はゴミ箱へ移すだけで、完全削除ではありません
-- 作る前に `list_rules` で既存を確認してください。Outlook の Web UI で作ったルールは条件が `fromAddresses` 形式で入っており、`create_rule` が使う `senderContains` とは別物です。同じ差出人に二重にルールを作ると、適用順の早い方が勝ちます
-
-### 短縮ID
-
-`search_messages` の各行は `#12` のような番号から始まります。Graph のメッセージIDは150文字前後あり、50件返すとそれだけで文脈を食い潰すためです。整理系ツールにはこの番号をそのまま渡します。
-
-```
-#12 2026-08-09 14:03 ●📎 Amazon.co.jp | ご注文の確認 | 受信トレイ
-```
-
-番号はサーバのプロセスが生きている間だけ有効で、**使い回されません**(再検索で `#3` の指す先が変わると事故になるため)。生のGraph IDも受け付けます。
-
-> **メールを移動すると、その短縮IDは失効します。** Graph は移動時にメッセージIDを再発行するためです。
->
-> ```
-> move_messages("#1,#2", "領収書")   → 成功
-> mark_messages_read("#1")           → エラー: 対象が見つかりません。
-> ```
->
-> 「移動してから既読にする」のような連続操作をするときは、**移動後に `search_messages` を引き直して
-> 新しい番号を取り直してください**。エラーは案内文字列で返るため処理は止まりません。
->
-> 既読化(`mark_messages_read` / `mark_read_by_search`)はメールを動かさないため、IDは失効しません。
+`move_by_search` refuses calls with no filter at all, so "move the entire mailbox" cannot happen by
+accident. `mark_read_by_search` allows it, since marking read does not relocate anything — but it warns
+that read state is not recoverable.
 
 ---
 
-## 既知の制約
+## Known limits
 
-**キーワード検索と厳密な新着順は両立しません。** Microsoft Graph は `$search` と `$filter` / `$orderby` を併用できない仕様です。このサーバは:
-
-- キーワードや差出人の指定があるとき → `$search`(KQL)で検索し、**関連度順**で最大100件取得してから手元で日付順に並べ替える
-- 指定がないとき → `$filter` + `$orderby` で**確実に新着順**
-
-という切り替えをしています。前者で該当が100件を超える場合、古いものが取りこぼされる可能性があります。その旨は結果の末尾に表示されます。
-
-**`search_messages` の `since` / `until` は UTC 基準です。** JST で「その日」を厳密に切りたい場合は、前後の日をまたいで取得し手元で絞り込んでください。
-
-**フォルダ階層は3階層までしか列挙しません。** それより深いフォルダは `list_folders` に出ません。移動操作自体は深さに関係なく機能します。
-
-**大量処理はスロットリングされることがあります。** Graph が `MailboxConcurrency limit` を返した分は失敗として報告されるので、同じ呼び出しを再実行すれば残りだけを拾えます。
+- **Keyword search and strict date ordering are mutually exclusive.** Graph does not allow `$search`
+  together with `$filter`/`$orderby`. With a keyword the server fetches up to 100 relevance-ranked
+  results and re-sorts them locally; without one it uses `$filter` + `$orderby` for true date order.
+  When more than 100 match, the response says so.
+- **`since` / `until` are UTC.** For a strict local-time day, fetch a wider window and narrow locally.
+- **Folder listing stops at three levels.** Deeper folders are not listed, though operations on them work.
+- **Large runs can be throttled.** Items that fail with `MailboxConcurrency limit` are reported; re-run
+  the same call to process the remainder.
 
 ---
 
-## 開発 / テスト
+## Development
 
 ```bash
-# macOS / Linux
 .venv/bin/pip install pytest
-.venv/bin/pytest -q              # 単体テスト
-.venv/bin/python smoke_test.py   # スモークテスト 10項目
+.venv/bin/pytest -q              # unit tests
+.venv/bin/python smoke_test.py   # stdio smoke test
 ```
 
-```powershell
-# Windows (PowerShell)
-.venv\Scripts\pip install pytest
-.venv\Scripts\pytest -q
-.venv\Scripts\python.exe smoke_test.py
-```
+Neither connects to Microsoft Graph or touches a mailbox, and neither needs credentials. The smoke test
+starts the server over stdio and checks what an MCP client actually sees: the tool list, input schemas,
+`destructive_hint` annotations, and that failures come back as readable guidance rather than tracebacks.
 
-どちらも **Microsoft Graph に接続せず、メールボックスを変更しません**。認証情報も不要で、ログイン前の状態のまま実行できます。
-
-- `test_outlook.py` — 関数単位。Graph呼び出しはスタブに差し替え、「どんなリクエストを組み立てたか」を検証します
-- `smoke_test.py` — サーバを実際に stdio で起動し、MCPクライアントから見える外形(ツール一覧・入力スキーマ・`destructive_hint`・エラー時の応答)を検証します
-
-テスト項目の一覧と実行エビデンスは **[docs/TEST.md](docs/TEST.md)** にあります。
-
-実アカウントに対する結合テストも実施済みです。書き込み側は**既存のメールに触れず**、テスト用のフォルダとメッセージを自作して往復させ、最後に自分で作ったものだけを片付ける形で確認しています。未検証のまま残っている範囲も同ドキュメントに明記しています。
+Details and evidence: **[docs/TEST.md](docs/TEST.md)** (Japanese).
 
 ---
 
-## ドキュメント
+## Documentation
 
-| | 対象読者 | 内容 |
+| | Audience | Contents |
 |---|---|---|
-| このREADME | 人間 | 機能・ユースケース・設計方針・ツール一覧 |
-| [docs/AZURE.md](docs/AZURE.md) | 人間 | Azureアプリ登録(唯一の手作業) |
-| [docs/SETUP-FOR-CLAUDE.md](docs/SETUP-FOR-CLAUDE.md) | **エージェント** | セットアップ手順書。Claude Code に読ませる |
-| [docs/TEST.md](docs/TEST.md) | 人間 | テスト項目とエビデンス |
+| This file | humans | overview, positioning, tools, limits |
+| [README.ja.md](README.ja.md) | humans | the full version — use cases, design rationale, detailed notes |
+| [docs/AZURE.en.md](docs/AZURE.en.md) | humans | Azure app registration, the only manual step |
+| [docs/SETUP-FOR-CLAUDE.md](docs/SETUP-FOR-CLAUDE.md) | **agents** | setup runbook, written to be read by Claude Code |
+| [docs/TEST.md](docs/TEST.md) | humans | test inventory and evidence (Japanese) |
+
+The Japanese README is the fuller document. This one is deliberately kept short so the two do not drift.
 
 ---
 
-## ライセンス
+## License
 
 MIT

@@ -1,8 +1,10 @@
-# Azure アプリ登録 — 人の手でやる唯一の作業
+# Azure アプリ登録 — 人の手で行うの作業
 
 このサーバを動かすのに必要な手作業は、**ここだけ**です。クライアントIDというGUIDを1個発行します。最初の一度きりで、以後Azureを開くことはありません。
 
 済んだら [SETUP-FOR-CLAUDE.md](SETUP-FOR-CLAUDE.md) を Claude Code に読ませれば、残りは自動で終わります。
+
+> English version: [AZURE.en.md](AZURE.en.md)
 
 無料です。Azureのサブスクリプション契約は要りません。
 

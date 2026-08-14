@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-label="Terminal session moving whole folder subtrees into an archive folder without moving any individual message">
+  <style>
+    .t { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 13.5px; }
+    .you  { fill: #7ee787; }
+    .cc   { fill: #d2a8ff; }
+    .tool { fill: #8b949e; }
+    .txt  { fill: #c9d1d9; }
+    .num  { fill: #79c0ff; }
+    .ok   { fill: #7ee787; font-weight: 700; }
+    .dim  { fill: #6e7681; }
+    .cap  { fill: #8b949e; font-size: 11.5px; }
+  </style>
+
+  <rect x="0" y="0" width="900" height="360" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <path d="M0 10a10 10 0 0 1 10-10h880a10 10 0 0 1 10 10v26H0z" fill="#161b22"/>
+  <line x1="0" y1="36" x2="900" y2="36" stroke="#30363d" stroke-width="1"/>
+  <circle cx="20" cy="18" r="5.5" fill="#ff5f57"/>
+  <circle cx="40" cy="18" r="5.5" fill="#febc2e"/>
+  <circle cx="60" cy="18" r="5.5" fill="#28c840"/>
+  <text class="t cap" x="84" y="22">Restructuring the folder tree — move_folder</text>
+
+  <text class="t you"  x="24" y="72">▸ You</text>
+  <text class="t txt"  x="24" y="94">  Move everything I no longer read under 99_Archive</text>
+
+  <text class="t cc"   x="24" y="132">● Claude</text>
+  <text class="t tool" x="24" y="154">  list_folders()</text>
+  <text class="t txt"  x="24" y="176">  Newsletters / SNS / Games / OldProjects have almost no unread mail</text>
+  <text class="t txt"  x="24" y="196">  and have not been touched in years. Moving the shelves, not the mail.</text>
+
+  <text class="t tool" x="24" y="232">  move_folder(folder="Newsletters", parent="99_Archive")</text>
+  <text class="t dim"  x="24" y="252">    Moved Newsletters under 99_Archive, subfolders included.</text>
+  <text class="t tool" x="24" y="274">  move_folder(folder="SNS", parent="99_Archive")  … 2 more</text>
+
+  <text class="t txt"  x="24" y="310">  <tspan class="num">~10,000 messages</tspan> archived. <tspan class="ok">Not one message was moved.</tspan></text>
+  <text class="t cap"  x="24" y="336">Four API calls. Moving them one by one would take thousands.</text>
+</svg>
