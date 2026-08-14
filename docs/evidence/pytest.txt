@@ -1,0 +1,51 @@
+outlook-mcp 単体テスト実行ログ
+実行日時: 2026-08-14 11:52:38 +0900
+コマンド: python -m pytest -v
+========================================================================
+============================= test session starts =============================
+platform win32 -- Python 3.13.1, pytest-9.1.1, pluggy-1.6.0 -- I:\ClaudeCodeProjects\outlook-mcp\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: I:\ClaudeCodeProjects\outlook-mcp
+configfile: pytest.ini
+testpaths: test_outlook.py
+plugins: anyio-4.14.2
+collecting ... collected 35 items
+
+test_outlook.py::test_filter_none_when_no_conditions PASSED              [  2%]
+test_outlook.py::test_filter_combines_conditions PASSED                  [  5%]
+test_outlook.py::test_filter_until_is_inclusive PASSED                   [  8%]
+test_outlook.py::test_bad_date_is_rejected PASSED                        [ 11%]
+test_outlook.py::test_kql_merges_everything PASSED                       [ 14%]
+test_outlook.py::test_kql_strips_inner_quotes PASSED                     [ 17%]
+test_outlook.py::test_kql_from_only PASSED                               [ 20%]
+test_outlook.py::test_html_to_text_drops_markup_and_script PASSED        [ 22%]
+test_outlook.py::test_html_to_text_decodes_entities PASSED               [ 25%]
+test_outlook.py::test_truncate_marks_omission PASSED                     [ 28%]
+test_outlook.py::test_resolve_by_exact_name PASSED                       [ 31%]
+test_outlook.py::test_resolve_by_full_path_disambiguates PASSED          [ 34%]
+test_outlook.py::test_resolve_ambiguous_name_raises_with_paths PASSED    [ 37%]
+test_outlook.py::test_resolve_well_known_when_not_in_list PASSED         [ 40%]
+test_outlook.py::test_resolve_unknown_raises PASSED                      [ 42%]
+test_outlook.py::test_handles_are_stable_and_not_reused PASSED           [ 45%]
+test_outlook.py::test_unknown_handle_raises PASSED                       [ 48%]
+test_outlook.py::test_raw_id_passes_through PASSED                       [ 51%]
+test_outlook.py::test_parse_refs_accepts_separators PASSED               [ 54%]
+test_outlook.py::test_parse_refs_rejects_empty_and_oversized PASSED      [ 57%]
+test_outlook.py::test_format_line_marks_unread_and_attachment PASSED     [ 60%]
+test_outlook.py::test_format_line_includes_preview_when_asked PASSED     [ 62%]
+test_outlook.py::test_format_line_handles_missing_fields PASSED          [ 65%]
+test_outlook.py::test_readonly_mode_blocks_writes PASSED                 [ 68%]
+test_outlook.py::test_writes_allowed_by_default PASSED                   [ 71%]
+test_outlook.py::test_search_with_query_uses_search_not_filter PASSED    [ 74%]
+test_outlook.py::test_search_without_query_uses_filter_and_orderby PASSED [ 77%]
+test_outlook.py::test_search_scopes_to_folder PASSED                     [ 80%]
+test_outlook.py::test_search_applies_unread_filter_clientside_when_searching PASSED [ 82%]
+test_outlook.py::test_search_caps_limit PASSED                           [ 85%]
+test_outlook.py::test_move_messages_posts_move_and_counts PASSED         [ 88%]
+test_outlook.py::test_move_to_trash_uses_wellknown_folder PASSED         [ 91%]
+test_outlook.py::test_partial_failure_is_reported_not_raised PASSED      [ 94%]
+test_outlook.py::test_write_tools_return_error_string_in_readonly PASSED [ 97%]
+test_outlook.py::test_get_message_renders_html_body PASSED               [100%]
+
+- generated xml file: I:\ClaudeCodeProjects\outlook-mcp\docs\evidence\junit.xml -
+============================= 35 passed in 1.33s ==============================

@@ -1,0 +1,31 @@
+outlook-mcp 書き込み系ツール 結合テスト(実アカウント)
+実行時刻: 2026-08-14T11:44:10+09:00
+方針:     既存メールには触れない。テスト用フォルダとメッセージを自作し、最後に片付ける。
+------------------------------------------------------------------------
+[PASS] W-01 create_folder がフォルダを作る
+         フォルダ「outlook-mcp-writetest」を作成しました。 / 実在確認: path=outlook-mcp-writetest
+[ -- ] フィクスチャ作成: outlook-mcp-writetest / 未読=True
+[PASS] W-02 作成したメッセージを search_messages が拾い短縮IDを振る
+         短縮ID = #1
+[PASS] W-03 mark_messages_read(read=True) が既読にする
+         1件を既読にしました。 / 実際の isRead=True
+[PASS] W-04 mark_messages_read(read=False) が未読に戻す
+         1件を未読にしました。 / 実際の isRead=False
+[PASS] W-05 archive_messages がアーカイブへ移す
+         1件をアーカイブしました。 / 移動後の所在: アーカイブ
+[PASS] W-06 移動後に古い短縮IDを使うとエラー文字列を返す(例外にしない)
+         get_message(#1) -> エラー: 対象が見つかりません。IDが古いか、すでに移動/削除されています。
+[PASS] W-07 move_messages が指定フォルダへ戻す
+         1件を「outlook-mcp-writetest」へ移動しました。 / 移動後の所在: outlook-mcp-writetest
+[PASS] W-08 存在しない移動先はエラー文字列で拒否し、メールを動かさない
+         エラー: フォルダ「存在しないフォルダ名12345」が見つかりません。既存: <フォルダ名のため伏せ字>
+[PASS] W-09 move_to_trash がゴミ箱へ移す
+         1件をゴミ箱へ移動しました(ゴミ箱から元に戻せます)。 / 移動後の所在: 削除済みアイテム
+[PASS] W-10 ゴミ箱から元に戻せる(完全削除ではない)
+         1件を「outlook-mcp-writetest」へ移動しました。 / 復元後の所在: outlook-mcp-writetest
+------------------------------------------------------------------------
+[片付け] テスト用メッセージを削除しました
+[片付け] テスト用フォルダ「outlook-mcp-writetest」を削除しました
+[片付け] 残存確認: 無し(メールボックスは元の状態)
+
+結果: 10/10 パス

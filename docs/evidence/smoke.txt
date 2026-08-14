@@ -1,0 +1,59 @@
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/inbox?$select=displayName,totalItemCount,unreadItemCount "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/messages?%24select=id%2Csubject%2Cfrom%2CreceivedDateTime%2CisRead%2ChasAttachments%2CbodyPreview%2CparentFolderId&%24search=%22%E3%83%86%E3%82%B9%E3%83%88%22&%24top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/<ID(伏字)>?$top=100 "HTTP/1.1 200 OK"
+HTTP Request: GET https://graph.microsoft.com/v1.0/me/mailFolders/inbox?$select=displayName,totalItemCount,unreadItemCount "HTTP/1.1 200 OK"
+outlook-mcp スモークテスト
+実行時刻: 2026-08-14T11:52:41+09:00
+Python:   3.13.1
+対象:     I:\ClaudeCodeProjects\outlook-mcp\outlook_server.py
+------------------------------------------------------------------------
+[PASS] S-01 stdio でハンドシェイクが成立し、サーバ名が outlook
+         server_info.name = 'outlook'
+[PASS] S-02 ツールが 9 個、名前が一致
+         公開: ['archive_messages', 'check_config', 'create_folder', 'get_message', 'list_folders', 'mark_messages_read', 'move_messages', 'move_to_trash', 'search_messages']
+[PASS] S-03 各ツールの required 引数がシグネチャどおり
+         全9ツール一致
+[PASS] S-04 read_only_hint / destructive_hint が正しく申告される
+         move_to_trash のみ destructive=True
+[PASS] S-05 送信・完全削除のツールが存在しない
+         該当なし
+[PASS] S-06 未設定/未ログインでも check_config が案内を返す
+         check_config -> 設定ファイル: I:\ClaudeCodeProjects\outlook-mcp\.env
+[PASS] S-07 未設定/未ログインでも search_messages が案内を返す
+         search_messages -> ●=未読 ○=既読
+[PASS] S-08 未知の短縮ID を案内文字列で拒否する
+         get_message -> エラー: 短縮ID #999999 は未知です。短縮IDはサーバ起動中のみ有効です。 search_messages で取り直してください。
+[PASS] S-09 25件を超える一括指定を拒否する
+         move_to_trash(30件) -> エラー: 一度に指定できるのは 25 件までです(指定 30 件)。分割して呼んでください。
+[PASS] S-10 check_config が書き込み可否を報告する
+         書き込み: 有効
+
+結果: 10/10 パス
