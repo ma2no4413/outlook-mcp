@@ -7,3 +7,6 @@ token_cache.json
 
 # 一括既読化の巻き戻し用スナップショット(メールIDの一覧)
 unread-backup.json
+
+# Claude Code の個人設定(パーミッション許可などを含むためコミットしない)
+.claude/settings.local.json
