@@ -32,6 +32,10 @@ from mcp.types import ToolAnnotations
 
 from outlook_auth import BASE_DIR, GRAPH_BASE, AuthError, acquire_token_silent, signed_in_account
 
+# このサーバのバージョン。MCPクライアントには serverInfo.version として渡り、
+# レジストリのリリース番号ともここで揃える。上げるときはここだけ触る。
+__version__ = "0.2.0"
+
 MAX_RESULTS = 50  # 1回の検索で返す上限
 MAX_IDS_PER_CALL = 25  # 1回の書き込み操作で触れる上限(誤爆の被害を有限にする)
 MAX_BODY_CHARS = 6000  # 本文の切り詰め
@@ -53,6 +57,7 @@ PAGE_SIZE = 100  # 一覧取得の1ページ
 
 mcp = MCPServer(
     name="outlook",
+    version=__version__,
     instructions=(
         "Hotmail/Outlook.com のメールボックスを検索し、整理(フォルダ移動・既読化・"
         "ゴミ箱へ移動)する。完全削除はできない。\n"

@@ -91,9 +91,15 @@ async def run() -> int:
             init = await session.initialize()
 
             # --- S-01 ハンドシェイク ---
+            # バージョンも見る。空のまま公開すると、クライアントにもレジストリにも
+            # 「版が分からないサーバ」として出る。実際 v0.2.0 まで空だった。
+            import outlook_server
+
             name = init.server_info.name
-            check("S-01", "stdio でハンドシェイクが成立し、サーバ名が outlook",
-                  name == "outlook", f"server_info.name = {name!r}")
+            version = init.server_info.version
+            check("S-01", "stdio でハンドシェイクが成立し、サーバ名とバージョンを申告する",
+                  name == "outlook" and version == outlook_server.__version__ and bool(version),
+                  f"server_info = {name!r} / {version!r}")
 
             # --- S-02 ツールが過不足なく公開される ---
             tools = {t.name: t for t in (await session.list_tools()).tools}
