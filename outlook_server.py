@@ -34,7 +34,7 @@ from outlook_auth import BASE_DIR, GRAPH_BASE, AuthError, acquire_token_silent, 
 
 # このサーバのバージョン。MCPクライアントには serverInfo.version として渡り、
 # レジストリのリリース番号ともここで揃える。上げるときはここだけ触る。
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 
 MAX_RESULTS = 50  # 1回の検索で返す上限
 MAX_IDS_PER_CALL = 25  # 1回の書き込み操作で触れる上限(誤爆の被害を有限にする)
@@ -953,16 +953,41 @@ def draft_reply(message_id: str, body: str, reply_all: bool = False) -> str:
 @mcp.tool(annotations=WRITE)
 @handle_errors
 def create_folder(name: str, parent: str | None = None) -> str:
-    """新しいフォルダを作る。
+    """空のフォルダを1つ作る。メールは移動しない。
+
+    メールの移動先が必要なときに先に呼ぶ。move_messages / move_by_search は
+    存在しないフォルダへは移動できないため、その前段として使う。
+    既にあるフォルダを動かしたい・名前を変えたいだけなら、こちらではなく
+    move_folder / rename_folder を使うこと。
+
+    挙動(いずれも実機で確認済み):
+      - 同じ親の下に同名のフォルダがあると Graph が 409 を返して失敗する。
+        重複したフォルダが二重にできることはない。作成前の存在確認は不要で、
+        失敗した場合は「既にある」と判断してよい。
+      - parent は既に存在している必要がある。中間のフォルダは自動で作られない。
+        深い階層を作るなら、上から順に1階層ずつ呼ぶこと。
+      - 作れるのは空のフォルダだけで、中身は増えない。既存のメールには影響しない。
+
+    必要な権限は Mail.ReadWrite で、このサーバが既に持っている。
+    OUTLOOK_READONLY=true のときは実行できない。
 
     Args:
-        name: 作成するフォルダ名。
-        parent: 親フォルダ名。省略すると最上位に作る。
+        name: 作成するフォルダ名。階層の指定はできないので "/" を含めないこと
+            (親を指定するには parent を使う)。同じ親の下で一意である必要がある。
+        parent: 親フォルダ名かフルパス(例「01_Crypto」「01_Crypto/取引所」)。
+            省略すると最上位に作る。既存のフォルダを指す必要がある。
     """
     ensure_writable()
     name = name.strip()
     if not name:
         raise ValueError("フォルダ名が空です。")
+    # "/" を許すと「a/b」という名前のフォルダが1つできてしまう。階層にはならず、
+    # 以後パス指定での解決も紛らわしくなる。rename_folder と同じ扱いにする。
+    if "/" in name:
+        raise ValueError(
+            f"フォルダ名に「/」は使えません(受け取った値: {name!r})。"
+            "階層の下に作るなら parent で親を指定してください。"
+        )
     if parent:
         pid = resolve_folder(parent, fetch_folders())
         path = f"/me/mailFolders/{pid}/childFolders"

@@ -348,6 +348,21 @@ def test_rename_folder_patches_display_name(calls):
     assert "改名しました" in out
 
 
+def test_create_folder_rejects_path_separator(calls):
+    # 「a/b」という名前のフォルダが1つできるだけで階層にはならない。
+    # docstring で「/ は使えない」と書いている以上、実際に弾く。
+    out = s.create_folder("親/子")
+    assert out.startswith("エラー:") and "「/」は使えません" in out
+    assert not any(m == "POST" for m, _, _ in calls)
+
+
+def test_create_folder_passes_name_through(calls):
+    s.create_folder("領収書2026", parent="受信トレイ")
+    method, path, kwargs = calls[-1]
+    assert (method, path) == ("POST", "/me/mailFolders/id-inbox/childFolders")
+    assert kwargs["json"] == {"displayName": "領収書2026"}
+
+
 def test_rename_folder_rejects_path_separator(calls):
     out = s.rename_folder("領収書", "親/子")
     assert out.startswith("エラー:") and "「/」は使えません" in out
