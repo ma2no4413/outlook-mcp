@@ -57,7 +57,7 @@ EXPECTED_TOOLS = {
     "move_by_search": {"read_only": False, "destructive": False, "required": ["dest"]},
     "archive_messages": {"read_only": False, "destructive": False, "required": ["message_ids"]},
     "mark_messages_read": {"read_only": False, "destructive": False, "required": ["message_ids"]},
-    "mark_read_by_search": {"read_only": False, "destructive": False, "required": []},
+    "mark_read_by_search": {"read_only": False, "destructive": True, "required": []},
     "create_rule": {"read_only": False, "destructive": False, "required": ["name"]},
     "move_to_trash": {"read_only": False, "destructive": True, "required": ["message_ids"]},
     "delete_folder": {"read_only": False, "destructive": True, "required": ["folder"]},

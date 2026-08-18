@@ -162,7 +162,7 @@ your mailbox, so keep it out of images and repositories.
 | `move_messages` | write | move up to 25 messages |
 | `move_by_search` | write | move everything matching a query, up to 2,000 |
 | `mark_messages_read` | write | toggle read/unread, up to 25 |
-| `mark_read_by_search` | write | mark everything matching a query, up to 25,000 |
+| `mark_read_by_search` | destructive | mark everything matching a query, up to 25,000 — **not reversible** |
 | `archive_messages` | write | move to Archive |
 | `create_rule` | write | create a server-side inbox rule |
 | `move_to_trash` | destructive | move to Deleted Items (recoverable) |

@@ -134,7 +134,7 @@ Graph が `$search` と `$filter` を併用できない制約に、実装が正�
 | S-01 | stdio ハンドシェイク | `server_info` が `name == "outlook"` と**空でないバージョン**を申告し、`outlook_server.__version__` と一致する | PASS |
 | S-02 | ツールの公開 | **19個**、名前が定義どおり | PASS |
 | S-03 | 入力スキーマ | 各ツールの `required` がシグネチャどおり | PASS |
-| S-04 | 操作種別の申告 | `read_only_hint` / `destructive_hint` が正しい（destructive は `move_to_trash` / `delete_folder` / `delete_rule` の3つ） | PASS |
+| S-04 | 操作種別の申告 | `read_only_hint` / `destructive_hint` が正しい（destructive は `move_to_trash` / `delete_folder` / `delete_rule` / **`mark_read_by_search`** の4つ） | PASS |
 | S-05 | **送信の経路が存在しない** | 送出系のツール名が無く、かつ要求スコープに `Mail.Send` が含まれない | PASS |
 | S-06 | 未設定/未ログイン時の `check_config` | 例外で落ちず、設定手順を案内する | PASS |
 | S-07 | 未設定/未ログイン時の `search_messages` | 例外で落ちず、不足しているもの（`.env` の値、またはログイン）を案内する | PASS |
@@ -156,6 +156,7 @@ S-06〜S-09 は「LLMが次の手を打てる文字列で返ること」を判�
 | 2 | `$search` の値を二重に引用符で囲っていた | `""領収書" AND from:"x""` という壊れたKQLを送っていた | U-05 / U-06 / **U-26** |
 | 3 | `$filter` で `contains(from/emailAddress/address, …)` を使っていた | Graph の messages は `contains()` 非対応。差出人の部分一致が常に400になる想定 | U-07 / **U-26** |
 | 4 | **README がリダイレクトURIを「空のまま」と案内していた** | 個人アカウントでのログインが `invalid_request: The provided request must include a 'redirect_uri' input parameter.` で必ず失敗する | **I-01**（自動テストでは検出不能） |
+| 5 | **`mark_read_by_search` が `destructive_hint=false` を申告していた** | 実際には最大25,000件を戻せない形で書き換える。メールIDを一度も返さないため「元々どれが未読だったか」を再構成できない。対応クライアントが確認を挟まず通してしまう | **S-04**（外部評価で指摘され、判定値を修正） |
 
 1件目は「単体テストが全部緑でも、クライアントからは1つも呼べない」という状態でした。スモークテストの層を分けた理由がこれです。
 

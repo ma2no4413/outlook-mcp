@@ -34,7 +34,7 @@ from outlook_auth import BASE_DIR, GRAPH_BASE, AuthError, acquire_token_silent, 
 
 # このサーバのバージョン。MCPクライアントには serverInfo.version として渡り、
 # レジストリのリリース番号ともここで揃える。上げるときはここだけ触る。
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 MAX_RESULTS = 50  # 1回の検索で返す上限
 MAX_IDS_PER_CALL = 25  # 1回の書き込み操作で触れる上限(誤爆の被害を有限にする)
@@ -1191,7 +1191,13 @@ def move_by_search(
     return out
 
 
-@mcp.tool(annotations=WRITE)
+# destructive を立てているのは、これが実務上戻せないため。
+# 既読/未読は「まだ見ていない」という情報そのもので、まとめて既読にすると
+# 何が未処理だったかは失われる。しかもこのツールはメールIDを一度も返さないので、
+# あとから「元々どれが未読だったか」を再構成する手段が無い。
+# 25件版の mark_messages_read は呼び出し側にIDが残るため read=False で戻せる。
+# そちらを WRITE のままにしているのは、その差による。
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True))
 @handle_errors
 def mark_read_by_search(
     folder: str | None = None,
