@@ -8,11 +8,11 @@
     "url": "https://github.com/ma2no4413/outlook-mcp",
     "source": "github"
   },
-  "version": "0.2.5",
+  "version": "0.2.6",
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/ma2no4413/outlook-mcp:0.2.5",
+      "identifier": "ghcr.io/ma2no4413/outlook-mcp:0.2.6",
       "transport": {
         "type": "stdio"
       },
