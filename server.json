@@ -1,0 +1,47 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ma2no4413/outlook-mcp",
+  "title": "Outlook Mailbox Tidier",
+  "description": "Restructure and triage a large Outlook / Hotmail mailbox via Microsoft Graph. Moves whole folder subtrees in one call, bulk-moves and bulk-marks-read with a dry run first, and manages inbox rules. Writes replies as drafts; it has no send tool and never requests Mail.Send.",
+  "websiteUrl": "https://github.com/ma2no4413/outlook-mcp",
+  "repository": {
+    "url": "https://github.com/ma2no4413/outlook-mcp",
+    "source": "github"
+  },
+  "version": "0.2.5",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/ma2no4413/outlook-mcp:0.2.5",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "OUTLOOK_CLIENT_ID",
+          "description": "Application (client) ID from the Azure app registration. See docs/AZURE.en.md for how to obtain one.",
+          "isRequired": true,
+          "isSecret": false
+        },
+        {
+          "name": "OUTLOOK_TOKEN_CACHE",
+          "description": "Path to the token cache file. In Docker, point this at a mounted volume so the sign-in survives restarts. The file is the key to the mailbox; never bake it into an image.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "OUTLOOK_TENANT",
+          "description": "common for personal and work/school accounts, consumers for personal Microsoft accounts only. Defaults to common.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "OUTLOOK_READONLY",
+          "description": "Set to true to disable every write tool at once, leaving only search and read.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

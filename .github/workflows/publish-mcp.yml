@@ -1,0 +1,82 @@
+# タグを打つと、コンテナイメージを GHCR へ push し、公式 MCP Registry へ公開する。
+#
+# 秘密情報の設定は不要。GHCR は GITHUB_TOKEN、レジストリ側は OIDC で認証する。
+# server.json の version とタグは食い違いうるので、タグの値で上書きしてから publish する。
+name: Publish to MCP Registry
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # GHCR への push
+      id-token: write   # MCP Registry の OIDC 認証
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: バージョンをタグから取り出す
+        id: v
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: GHCR にログイン
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # イメージ名は小文字でなければ GHCR が受け付けない。
+      - name: イメージ名を決める
+        id: img
+        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: イメージをビルドして push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.img.outputs.name }}:${{ steps.v.outputs.version }}
+            ${{ steps.img.outputs.name }}:latest
+
+      # レジストリは server.json の name と、イメージに埋めた
+      # io.modelcontextprotocol.server.name ラベルの一致で所有権を確認する。
+      # ここが食い違うと publish が弾かれるので、push 済みのイメージから読んで照合する。
+      - name: イメージのラベルと server.json の name が一致することを確認
+        run: |
+          image="${{ steps.img.outputs.name }}:${{ steps.v.outputs.version }}"
+          docker pull -q "$image"
+          label=$(docker inspect "$image" \
+                  --format '{{ index .Config.Labels "io.modelcontextprotocol.server.name" }}')
+          want=$(jq -r .name server.json)
+          echo "label=$label"
+          echo "want =$want"
+          if [ "$label" != "$want" ]; then
+            echo "::error::イメージのラベルと server.json の name が一致しません"
+            exit 1
+          fi
+
+      - name: server.json のバージョンをタグに合わせる
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          img="${{ steps.img.outputs.name }}:$v"
+          jq --arg v "$v" --arg img "$img" \
+            '.version = $v | .packages[0].identifier = $img' server.json > tmp.json
+          mv tmp.json server.json
+          cat server.json
+
+      - name: mcp-publisher を入れる
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: MCP Registry に認証(OIDC)
+        run: ./mcp-publisher login github-oidc
+
+      - name: MCP Registry へ公開
+        run: ./mcp-publisher publish

@@ -23,6 +23,10 @@
 
 FROM python:3.13-slim
 
+# MCP Registry がイメージの所有権を確認するために読むラベル。
+# server.json の name と完全に一致している必要がある。
+LABEL io.modelcontextprotocol.server.name="io.github.ma2no4413/outlook-mcp"
+
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
