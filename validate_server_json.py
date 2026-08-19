@@ -11,6 +11,8 @@ import re
 import sys
 from pathlib import Path
 
+import console_utf8  # noqa: F401  出力を UTF-8 に固定する(import した時点で効く)
+
 ROOT = Path(__file__).resolve().parent
 LIMITS = {"description": 100, "title": 100}
 
