@@ -44,6 +44,11 @@ jobs:
       - name: スモークテスト (stdio)
         run: python smoke_test.py
 
+      # publish はタグを打った後にしか走らない。そこで弾かれるとタグを消して
+      # やり直しになるため、レジストリの制約はここで先に確認する。
+      - name: server.json の妥当性
+        run: python validate_server_json.py
+
   docker:
     name: Docker image
     runs-on: ubuntu-latest

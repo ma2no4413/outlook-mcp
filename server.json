@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.ma2no4413/outlook-mcp",
   "title": "Outlook Mailbox Tidier",
-  "description": "Restructure and triage a large Outlook / Hotmail mailbox via Microsoft Graph. Moves whole folder subtrees in one call, bulk-moves and bulk-marks-read with a dry run first, and manages inbox rules. Writes replies as drafts; it has no send tool and never requests Mail.Send.",
+  "description": "Tidy a large Outlook / Hotmail mailbox. Folder subtree moves, bulk ops with dry run, never sends.",
   "websiteUrl": "https://github.com/ma2no4413/outlook-mcp",
   "repository": {
     "url": "https://github.com/ma2no4413/outlook-mcp",
